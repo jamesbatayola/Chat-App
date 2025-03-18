@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<!-- render here -->
+	</body>
+
+	<script type="module">
+		import { loadLoginPage } from "/renderPage/loginPage.js";
+
+		// render login form
+		document.body.innerHTML = loadLoginPage();
+
+		const email = document.querySelector(".email-input");
+		const password = document.querySelector(".password-input");
+
+		document.querySelector(".login-form").addEventListener("submit", async (ev) => {
+			ev.preventDefault();
+
+			console.log(email.value);
+			console.log(password.value);
+
+			const response = await fetch("http://localhost:7000/auth/login", {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					email: email.value,
+					password: password.value,
+				}),
+			});
+
+			const data = await response.json();
+			console.log(data);
+		});
+	</script>
+</html>

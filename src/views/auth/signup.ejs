@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<!-- render here -->
+	</body>
+
+	<style>
+		.input-error {
+			border: 1px solid red;
+			background-color: rgb(255, 150, 150);
+		}
+	</style>
+
+	<!-- type="module" tells the browser that this is an ES Module, allowing import/export inside signupPage.js. -->
+	<script type="module">
+		import { loadSignupPage } from "/renderPage/signupPage.js";
+
+		// render signup form
+		document.body.innerHTML = loadSignupPage();
+
+		const email = document.querySelector(".email-input");
+		const password = document.querySelector(".password-input");
+		const confirm_password = document.querySelector(".confirm-password-input");
+
+		document.querySelector(".signup-form").addEventListener("submit", async (ev) => {
+			ev.preventDefault();
+
+			const response = await fetch("http://localhost:7000/auth/signup", {
+				method: "post",
+				headers: {
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					email: email.value,
+					password: password.value,
+					confirmPassword: confirm_password.value,
+				}),
+			});
+
+			const data = await response.json();
+
+			console.log(data);
+		});
+	</script>
+</html>
+
+<!-- // error_handling
+
+const fields = ["email", "password", "confirmPassword"];
+
+if (data.type === "input_validation_error" && data.info.length > 0) {
+	let count = 0;
+
+	for (let i = 0; i < data.info.length; i++) {
+		if (data.info[i].field === fields[count]) {
+			document.querySelector(`#${fields[count]}`).classList.add("input-error");
+			count++;
+			continue;
+		} else {
+			document.querySelector(`#${fields[count]}`).classList.remove("input-error");
+		}
+	}
+} -->
