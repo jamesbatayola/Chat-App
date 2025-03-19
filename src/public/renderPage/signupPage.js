@@ -21,5 +21,12 @@ export const loadSignupPage = () => {
 			</div>
 			<button type="submit">Sign up</button>
 		</form>
+
+		 <style>
+            form {
+                border: 1px solid black;
+                padding: 1rem;
+            }
+        </style>
     `;
 };

@@ -12,5 +12,12 @@ export const loadLoginPage = () => {
             </div>
             <button type="submit">Login</button>
         </form>
+
+        <style>
+            form {
+                border: 1px solid black;
+                padding: 1rem;
+            }
+        </style>
     `;
 };

@@ -21,9 +21,6 @@
 		document.querySelector(".login-form").addEventListener("submit", async (ev) => {
 			ev.preventDefault();
 
-			console.log(email.value);
-			console.log(password.value);
-
 			const response = await fetch("http://localhost:7000/auth/login", {
 				method: "POST",
 				headers: {
@@ -35,8 +32,21 @@
 				}),
 			});
 
+			// jwt token is set to the client
 			const data = await response.json();
+
+			if (data.status === "success") {
+				window.location.href = `http://localhost:7000/${data.link}`;
+				return;
+			}
+
 			console.log(data);
 		});
 	</script>
+
+	<style>
+		.login-form {
+			border: 1px solid black;
+		}
+	</style>
 </html>

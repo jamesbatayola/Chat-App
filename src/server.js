@@ -4,6 +4,7 @@ import express, { urlencoded } from "express";
 import sequelize from "./config/database.js";
 import cors from "cors";
 import kleur from "kleur";
+import cookieParser from "cookie-parser";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -24,6 +25,7 @@ import User from "./models/user.js";
 
 // --------- ROUTES --------- //
 import authRoute from "./routes/auth.js";
+import chatRoute from "./routes/chat.js";
 
 // --------- MIDDLEWARES --------- //
 app.use(cors());
@@ -31,16 +33,18 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public"))); // serves static files
 app.use(urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/auth", authRoute);
+app.use(chatRoute);
 
 // global error handler
 // returns to the client
 app.use((error, req, res, next) => {
 	res.status(error.statusCode).json({
-		type: error.type,
-		message: error.message || "INTERNAL ERROR",
 		info: error.info,
+		message: error.message || "INTERNAL ERROR",
+		status: error.status,
 	});
 });
 

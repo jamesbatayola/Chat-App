@@ -6,15 +6,22 @@ const getLogin = async (req, res, next) => {
 
 const postLogin = async (req, res, next) => {
 	try {
-		const user = await loginUser(req.body);
+		// Authenticate user & generate JWT
+		const payload = await loginUser(req.body);
+
+		console.log(payload);
+
+		// Storing JWT token via HttpOnly cookie
+		res.cookie("token", payload.token, {
+			httOnly: true, // XSS protection
+			sameSite: "Strict", // SRF protection
+			maxAge: 3600000, // 1 hour expiration
+		});
 
 		res.status(200).json({
-			status: 200,
-			message: "successully logged in",
-			user: {
-				id: user.id,
-				email: user.email,
-			},
+			status: "success",
+			message: "Redirecting to home page",
+			link: "home",
 		});
 	} catch (err) {
 		next(err);

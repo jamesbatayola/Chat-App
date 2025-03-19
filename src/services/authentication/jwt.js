@@ -1,55 +1,50 @@
 import jwt from "jsonwebtoken";
 import User from "../../models/user.js";
+import kleur from "kleur";
+import { bgBlue } from "kleur/colors";
 
-// 1) Get the token from HEADER
+// 1) Get the token from COOKIE
 // 2) Decode the token
 // 3) Assign its payload to request object
 
-const verify = async (req, res, next) => {
+export const jwtAuth = async (req, res, next) => {
 	try {
 		// ------- 1st STEP ------- //
 
-		const authHeader = req.get("authorization");
+		const token = req.cookies.token;
 
-		if (!authHeader) {
+		if (!token) {
+			console.log(kleur.bgRed("NO JWT TOKEN PROVIDED"));
 			const error = new Error("No JWT token provided");
+			error.status = "failed";
 			error.statusCode = 401;
-			return next(error);
+			throw error;
 		}
-
-		// fetches token besides Bearer
-		const token = authHeader.split(" ")[1];
 
 		// ------- 2nd STEP ------- //
 
 		// temp decoded token variable
 		let decodedToken;
 
-		// decode token
-		jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
-			if (!err) {
-				decodedToken = decoded;
-			}
-
-			// error handler
-			if (err.name === "TokenExpiredError") {
-				return res.status(401).json({ message: "Token has expired" });
-			} else if (err.name === "JsonWebTokenError") {
-				return res.status(401).json({ message: "Invalid token" });
-			} else {
-				return res.status(500).json({ message: "Internal server error" });
-			}
-		});
+		try {
+			decodedToken = jwt.verify(token, process.env.JWT_TOKEN);
+		} catch (err) {
+			console.log(kleur.bgRed("ERROR DECODING TOKEN"));
+			const error = new Error(err.message);
+			error.statusCode = err.name === "TokenExpiredError" ? 401 : 403; // 401 → Expired, 403 → Invalid
+			throw error;
+		}
 
 		// ------- 3rd STEP ------- //
 
 		// fetches and assign jwt payload to req.user object
-		req.user = await User.find({ where: { email: decodedToken.email } });
+		req.user = await User.findOne({ where: { email: decodedToken.email } });
 
 		if (!req.user) {
+			console.log(kleur.bgRed("TOKEN MISMTACH"));
 			const error = new Error("Token-User mismatch error");
 			error.statusCode = 401;
-			next(error);
+			throw error;
 		}
 
 		next();
@@ -59,5 +54,3 @@ const verify = async (req, res, next) => {
 		next(err);
 	}
 };
-
-export default verify;
