@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.get("/home", jwtAuth, chatController.getHome);
 
+router.get("/addfriend", jwtAuth, chatController.getAddFriend);
+
 export default router;

@@ -1,5 +1,9 @@
 const getHome = (req, res, next) => {
-	res.render("home/index");
+	res.render("home/home");
 };
 
-export default { getHome };
+const getAddFriend = (req, res, next) => {
+	res.render("home/add_friend");
+};
+
+export default { getHome, getAddFriend };
