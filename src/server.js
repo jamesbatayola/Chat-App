@@ -22,6 +22,18 @@ app.set("views", path.join(__dirname, "views"));
 
 // --------- MODELS --------- //
 import User from "./models/user.js";
+import Message from "./models/message.js";
+import ChatRoom from "./models/chatRoom.js";
+import ChatMember from "./models/chatMember.js";
+
+Message.belongsTo(User); // A message is sent by one specific user.
+User.hasMany(Message); // A user can send many messages.
+
+Message.belongsTo(ChatRoom); //  Each message belongs to one specific chatroom.
+ChatRoom.hasMany(Message); // A chatroom can have multiple messages
+
+User.belongsToMany(ChatRoom, { through: ChatMember }); //  A user can join multiple chatrooms.
+ChatRoom.belongsToMany(User, { through: ChatMember }); // A chatroom can have multiple users.
 
 // --------- ROUTES --------- //
 import authRoute from "./routes/auth.js";
@@ -31,6 +43,7 @@ import chatRoute from "./routes/chat.js";
 app.use(cors());
 
 app.use(express.static(path.join(__dirname, "public"))); // serves static files
+
 app.use(urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
@@ -49,12 +62,14 @@ app.use((error, req, res, next) => {
 });
 
 // --------- STARTS SERVER --------- //
+
+import { runServer } from "./services/server.js";
+
 try {
 	const sync = await sequelize.sync();
 
-	app.listen(PORT, () => {
-		console.log(kleur.bgWhite(`Listening on port ${kleur.bgCyan(PORT)}`));
-	});
+	// RUNS THE SERVEr
+	await runServer(app, PORT);
 } catch (err) {
 	console.log("DATABASE ERROR", err);
 }

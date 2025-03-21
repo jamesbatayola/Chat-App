@@ -7,5 +7,8 @@ const router = express.Router();
 router.get("/home", jwtAuth, chatController.getHome);
 
 router.get("/addfriend", jwtAuth, chatController.getAddFriend);
+router.post("/addfriend", jwtAuth, chatController.postAddFriend);
 
 export default router;
+
+import crypto from "crypto";

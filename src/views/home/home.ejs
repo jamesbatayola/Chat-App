@@ -6,9 +6,7 @@
 		<title>Document</title>
 	</head>
 	<body>
-		<!-- render here -->
-
-		<!-- <div class="container">
+		<div class="container">
 			<div class="content">
 				<div class="friends-list">
 					<div class="friend">
@@ -18,14 +16,11 @@
 				</div>
 				<div class="add-friend">Add friend</div>
 			</div>
-		</div> -->
+		</div>
 	</body>
 </html>
 
 <script type="module">
-	import { loadHomePage } from "/renderPage/homePage.js";
-	document.body.innerHTML = loadHomePage();
-
 	const friends = document.querySelectorAll(".friend");
 	const addFriend = document.querySelector(".add-friend");
 
@@ -38,9 +33,18 @@
 	addFriend.addEventListener("click", async (ev) => {
 		window.location.href = "http://localhost:7000/addfriend";
 	});
+
+	// ------- WEB SOCKET ------- //
+
+	const ws = new WebSocket("ws://localhost:7000");
+	console.log(ws);
+
+	ws.onopen = () => {
+		
+	}
 </script>
 
-<!-- <style>
+<style>
 	.container {
 		border: 1px solid black;
 		height: 100vh;
@@ -92,4 +96,4 @@
 		cursor: pointer;
 		margin-left: auto;
 	}
-</style> -->
+</style>

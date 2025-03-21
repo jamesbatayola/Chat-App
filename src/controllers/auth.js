@@ -1,4 +1,7 @@
+import kleur from "kleur";
 import { createUser, loginUser } from "../services/authentication/authPage.js";
+import { getServer } from "../services/server.js";
+import { wsInit, getWsServer } from "../services/webSocket.js";
 
 const getLogin = async (req, res, next) => {
 	res.render("auth/login");
@@ -9,14 +12,22 @@ const postLogin = async (req, res, next) => {
 		// Authenticate user & generate JWT
 		const payload = await loginUser(req.body);
 
-		console.log(payload);
-
 		// Storing JWT token via HttpOnly cookie
 		res.cookie("token", payload.token, {
 			httOnly: true, // XSS protection
 			sameSite: "Strict", // SRF protection
 			maxAge: 3600000, // 1 hour expiration
 		});
+
+		// create websocket handshake
+		const server = getServer();
+		const wsServer = wsInit(server);
+
+		wsServer.on("connection", (ws) => {
+			
+		})
+
+		console.log(kleur.bgGreen("WEB SOCKET IS ESTABLISHED"));
 
 		res.status(200).json({
 			status: "success",
@@ -41,6 +52,7 @@ const postSignup = async (req, res, next) => {
 			message: "successfully created an account",
 			createdUser: {
 				id: newUser.id,
+				username: newUser.username,
 				email: newUser.email,
 			},
 		});

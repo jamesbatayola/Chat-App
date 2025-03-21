@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 
-import sequelize from "../config/database";
+import sequelize from "../config/database.js";
 
 const Message = sequelize.define("message", {
 	id: {
@@ -10,9 +10,7 @@ const Message = sequelize.define("message", {
 		primaryKey: true,
 	},
 
-	sender: {},
-
-	message_text: {
+	content: {
 		type: DataTypes.STRING,
 		allowNull: false,
 	},

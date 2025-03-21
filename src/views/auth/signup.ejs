@@ -6,23 +6,38 @@
 		<title>Document</title>
 	</head>
 	<body>
-		<!-- render here -->
+		<div class="container">
+			<form class="signup-form">
+				<h1>Create Account</h1>
+				<div>
+					<label for="username">username</label>
+					<input id="username" class="username-input" name="username" type="text" />
+				</div>
+				<div>
+					<label for="email">email</label>
+					<input id="email" class="email-input" name="email" type="text" />
+				</div>
+				<div>
+					<label for="password">password</label>
+					<input id="password" class="password-input" name="password" type="text" />
+				</div>
+				<div>
+					<label for="confirm_password">confirm password</label>
+					<input
+						id="confirmPassword"
+						class="confirm-password-input"
+						name="confirm_password"
+						type="text"
+					/>
+				</div>
+				<button type="submit">Sign up</button>
+			</form>
+		</div>
 	</body>
-
-	<style>
-		.input-error {
-			border: 1px solid red;
-			background-color: rgb(255, 150, 150);
-		}
-	</style>
 
 	<!-- type="module" tells the browser that this is an ES Module, allowing import/export inside signupPage.js. -->
 	<script type="module">
-		import { loadSignupPage } from "/renderPage/signupPage.js";
-
-		// render signup form
-		document.body.innerHTML = loadSignupPage();
-
+		const username = document.querySelector(".username-input");
 		const email = document.querySelector(".email-input");
 		const password = document.querySelector(".password-input");
 		const confirm_password = document.querySelector(".confirm-password-input");
@@ -36,6 +51,7 @@
 					"content-type": "application/json",
 				},
 				body: JSON.stringify({
+					username: username.value,
 					email: email.value,
 					password: password.value,
 					confirmPassword: confirm_password.value,
@@ -44,9 +60,41 @@
 
 			const data = await response.json();
 
+			if (data.status === "success") {
+				window.location.href = `http://localhost:7000/auth/login`;
+			}
+
 			console.log(data);
 		});
 	</script>
+
+	<style>
+		*,
+		body {
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+		}
+
+		.container {
+			border: 1px solid black;
+			height: 100vh;
+			width: 100%;
+			display: grid;
+			place-items: center;
+		}
+
+		form {
+			padding: 1rem;
+			border-radius: 0.7rem;
+			border: 1px solid gray;
+		}
+
+		.input-error {
+			border: 1px solid red;
+			background-color: rgb(255, 150, 150);
+		}
+	</style>
 </html>
 
 <!-- // error_handling

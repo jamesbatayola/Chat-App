@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../../models/user.js";
+import { generateId } from "../../utils/generateId.js";
 import { hashPassword, decryptPassword } from "../../utils/bcryt.js";
 
 export const createUser = async (requestBody) => {
-	const { email, password } = requestBody;
+	const { username, email, password } = requestBody;
 
 	const findUser = await User.findOne({ where: { email: email } });
 
@@ -15,13 +16,22 @@ export const createUser = async (requestBody) => {
 		throw error;
 	}
 
+	// sequelize hook: generates id
+	// User.beforeCreate(async (user) => {
+	// 	user.id = await generateId();
+	// });
+
+	// store user to databse
 	const newUser = await User.create({
+		id: await generateId(),
+		username: username,
 		email: email,
 		password: await hashPassword(password),
 	});
 
 	return {
 		user: {
+			username: newUser.username,
 			id: newUser.id,
 			email: newUser.email,
 		},

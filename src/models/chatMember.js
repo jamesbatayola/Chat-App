@@ -2,18 +2,18 @@ import { DataTypes } from "sequelize";
 
 import sequelize from "../config/database.js";
 
-const ChatRoom = sequelize.define("chatRoom", {
+const ChatMember = sequelize.define("chatMember", {
 	id: {
 		primaryKey: true,
 		allowNull: false,
-		type: DataTypes.INTEGER,
 		autoIncrement: true,
+		type: DataTypes.INTEGER,
 	},
 
-	name: {
-		type: DataTypes.STRING,
+	joined_at: {
+		type: DataTypes.DATE,
 		allowNull: false,
 	},
 });
 
-export default ChatRoom;
+export default ChatMember;

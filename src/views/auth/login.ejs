@@ -6,15 +6,23 @@
 		<title>Document</title>
 	</head>
 	<body>
-		<!-- render here -->
+		<div class="container">
+			<form class="login-form" action="">
+				<h1>Login</h1>
+				<div>
+					<label for="">email</label>
+					<input class="email-input" type="text" />
+				</div>
+				<div>
+					<label for="">password</label>
+					<input class="password-input" type="text" />
+				</div>
+				<button type="submit">Login</button>
+			</form>
+		</div>
 	</body>
 
 	<script type="module">
-		import { loadLoginPage } from "/renderPage/loginPage.js";
-
-		// render login form
-		document.body.innerHTML = loadLoginPage();
-
 		const email = document.querySelector(".email-input");
 		const password = document.querySelector(".password-input");
 
@@ -45,8 +53,25 @@
 	</script>
 
 	<style>
-		.login-form {
+		*,
+		body {
+			padding: 0;
+			margin: 0;
+			box-sizing: border-box;
+		}
+
+		.container {
 			border: 1px solid black;
+			height: 100vh;
+			width: 100%;
+			display: grid;
+			place-items: center;
+		}
+
+		form {
+			padding: 1rem;
+			border-radius: 0.7rem;
+			border: 1px solid gray;
 		}
 	</style>
 </html>
