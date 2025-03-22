@@ -9,12 +9,21 @@
 		<div class="container">
 			<div class="content">
 				<div class="friends-list">
+					<% if(friends.length <= 0) { %>
+
+					<div class="friend">You have no friend</div>
+
+					<% } else { %> <% for(let friend of friends) { %>
 					<div class="friend">
-						<div class="username">Jake</div>
+						<div class="username"><%= friend.username %></div>
 						<div class="status"></div>
 					</div>
+					<% } %> <% } %>
 				</div>
-				<div class="add-friend">Add friend</div>
+				<div class="button-container">
+					<div class="friend-request">Friend request</div>
+					<div class="search-friend">Add friend</div>
+				</div>
 			</div>
 		</div>
 	</body>
@@ -22,7 +31,7 @@
 
 <script type="module">
 	const friends = document.querySelectorAll(".friend");
-	const addFriend = document.querySelector(".add-friend");
+	const searchFriend = document.querySelector(".search-friend");
 
 	friends.forEach((friend) => {
 		friend.addEventListener("click", async (ev) => {
@@ -30,18 +39,17 @@
 		});
 	});
 
-	addFriend.addEventListener("click", async (ev) => {
-		window.location.href = "http://localhost:7000/addfriend";
+	searchFriend.addEventListener("click", async (ev) => {
+		window.location.href = "http://localhost:7000/searchfriend";
 	});
 
 	// ------- WEB SOCKET ------- //
 
-	const ws = new WebSocket("ws://localhost:7000");
-	console.log(ws);
+	// const ws = new WebSocket("ws://localhost:7000");
 
-	ws.onopen = () => {
-		
-	}
+	// ws.onmessage = (ev) => {
+	// 	console.log(ev.data);
+	// };
 </script>
 
 <style>
@@ -77,17 +85,6 @@
 		background-color: rgb(195, 195, 195);
 	}
 
-	.add-friend {
-		border: 1px solid gray;
-		text-align: center;
-		padding: 0.5rem 0.2rem;
-		cursor: pointer;
-	}
-
-	.add-friend:hover {
-		background-color: rgb(195, 195, 195);
-	}
-
 	.status {
 		border: 1px solid green;
 		border-radius: 50%;
@@ -95,5 +92,24 @@
 		background-color: green;
 		cursor: pointer;
 		margin-left: auto;
+	}
+
+	.button-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.search-friend,
+	.friend-request {
+		border: 1px solid gray;
+		text-align: center;
+		padding: 0.5rem 0.2rem;
+		cursor: pointer;
+		flex-grow: 1;
+	}
+
+	.seach-friend:hover {
+		background-color: rgb(195, 195, 195);
 	}
 </style>

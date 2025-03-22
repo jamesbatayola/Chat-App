@@ -19,15 +19,9 @@ const postLogin = async (req, res, next) => {
 			maxAge: 3600000, // 1 hour expiration
 		});
 
-		// create websocket handshake
-		const server = getServer();
-		const wsServer = wsInit(server);
+		// const wsServer = getWsServer();
 
-		wsServer.on("connection", (ws) => {
-			
-		})
-
-		console.log(kleur.bgGreen("WEB SOCKET IS ESTABLISHED"));
+		// wsServer.on("connection", (ws, req) => {});
 
 		res.status(200).json({
 			status: "success",

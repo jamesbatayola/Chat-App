@@ -25,6 +25,16 @@ import User from "./models/user.js";
 import Message from "./models/message.js";
 import ChatRoom from "./models/chatRoom.js";
 import ChatMember from "./models/chatMember.js";
+import Friendship from "./models/friendship.js";
+
+// Always define foreignKey and otherKey explicitly
+// when doing self-referencing many-to-many relationships to avoid confusion.
+User.belongsToMany(User, {
+	through: Friendship, // Junction table (stores friendships)
+	as: "Friends", // Alias for easier querying
+	foreignKey: "userId", // Column referring to the user who initiated the friendship
+	otherKey: "friendId", // Column referring to the friend being added
+});
 
 Message.belongsTo(User); // A message is sent by one specific user.
 User.hasMany(Message); // A user can send many messages.
@@ -64,12 +74,14 @@ app.use((error, req, res, next) => {
 // --------- STARTS SERVER --------- //
 
 import { runServer } from "./services/server.js";
+import { wsInit } from "./services/webSocket.js";
 
 try {
 	const sync = await sequelize.sync();
 
-	// RUNS THE SERVEr
-	await runServer(app, PORT);
+	// RUNS THE NODE AND WEBSOCKET SERVER
+	const nodeServer = await runServer(app, PORT);
+	const wsServer = await wsInit(nodeServer);
 } catch (err) {
 	console.log("DATABASE ERROR", err);
 }

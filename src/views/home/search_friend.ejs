@@ -16,7 +16,7 @@
 					</div>
 					<button>Add</button>
 					<hr />
-					<p>Your id: <%= user.id %></p>
+					<p>Your id: <span class="myID"><%= user.id %></span></p>
 				</form>
 				<div class="userlist-container">
 					<!-- <h2>Users</h2> -->
@@ -32,27 +32,30 @@
 
 <script type="module">
 	const username_input = document.querySelector(".username-input");
+	const myID = document.querySelector(".myID").textContent;
+
+	console.log(myID);
+
 	const userlist_container = document.querySelector(".userlist-container");
 
 	document.querySelector(".form-class").addEventListener("submit", async (ev) => {
 		ev.preventDefault();
 
-		console.log(username_input.value);
-
-		const res = await fetch("http://localhost:7000/addfriend", {
+		const res = await fetch("http://localhost:7000/searchFriend", {
 			method: "post",
 			headers: {
 				"content-type": "application/json",
 			},
 			body: JSON.stringify({
 				username: username_input.value,
+				myID: myID,
 			}),
 		});
 
 		const data = await res.json();
 
 		if (data.message === "No user found") {
-			userlist_container.innerHTML = "<h2>No user found</h2>";
+			userlist_container.innerHTML = `<h2>${data.message}</h2>`;
 		} else {
 			userlist_container.innerHTML = "<h2>Users</h2>";
 			data.users.forEach((user) => {
@@ -63,12 +66,23 @@
 						<div class="user_name">${user.username}</div>
 						<div class="user_id">#${user.id}</div>
 						<div class="add-button">+</div>
-					</div> 
+					</div>
 				`;
 
 				userlist_container.append(div);
 			});
 		}
+
+		const addFriendButtons = document.querySelectorAll(".add-button");
+
+		addFriendButtons.forEach((btn) =>
+			btn.addEventListener("click", async (ev) => {
+				const username = ev.target.parentElement.querySelector(".user_name");
+				const userId = ev.target.parentElement.querySelector(".user_id");
+
+				// const res = await fetch("http://localhost:7000/");
+			}),
+		);
 
 		console.log(data);
 	});

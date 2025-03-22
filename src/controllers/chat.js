@@ -1,18 +1,36 @@
-import { addFriend } from "../services/home/addFriend.js";
+import kleur from "kleur";
+import { searchFriend } from "../services/home/searchFriend.js";
+import { getWsServer } from "../services/webSocket.js";
 
 const getHome = async (req, res, next) => {
-	res.render("home/home");
+	try {
+		const user = req.user;
+
+		if (!user) {
+			const err = new Error("User does not exist");
+			err.statusCode = 404;
+			throw err;
+		}
+
+		const userFriends = await user.getFriends();
+
+		res.render("home/home", {
+			friends: userFriends,
+		});
+	} catch (err) {
+		next(err);
+	}
 };
 
-const getAddFriend = async (req, res, next) => {
-	res.render("home/add_friend", {
+const getSearchFriend = async (req, res, next) => {
+	res.render("home/search_friend", {
 		user: req.user,
 	});
 };
 
-const postAddFriend = async (req, res, next) => {
+const postSearchFriend = async (req, res, next) => {
 	try {
-		const users = await addFriend(req.body);
+		const users = await searchFriend(req.body);
 
 		res.status(200).json({
 			users,
@@ -22,4 +40,4 @@ const postAddFriend = async (req, res, next) => {
 	}
 };
 
-export default { getHome, getAddFriend, postAddFriend };
+export default { getHome, getSearchFriend, postSearchFriend };
