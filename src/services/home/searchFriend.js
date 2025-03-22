@@ -28,4 +28,26 @@ export const searchFriend = async (requestBody) => {
 	return users;
 };
 
-export const addFriend = async (requestBody) => {};
+export const addFriend = async (requestObject) => {
+	const user = await requestObject.user;
+
+	if (!user) {
+		const err = new Error("User is not provided in the request body");
+		err.statusCode = 404;
+		throw err;
+	}
+
+	const { userId } = await requestObject.body;
+
+	if (!userId) {
+		const err = new Error("User id does not exist");
+		err.statusCode = 404;
+		throw err;
+	}
+
+	const friendToAdd = await User.findByPk(userId);
+
+	await user.addFriend(friendToAdd);
+
+	return;
+};

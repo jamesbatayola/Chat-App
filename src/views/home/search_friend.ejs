@@ -18,7 +18,7 @@
 					<hr />
 					<p>Your id: <span class="myID"><%= user.id %></span></p>
 				</form>
-				<div class="userlist-container">
+				<div class="userlist-container" style="visibility: hidden">
 					<!-- <h2>Users</h2> -->
 					<!-- <div class="user">
 						<div class="name">rain</div>
@@ -41,6 +41,8 @@
 	document.querySelector(".form-class").addEventListener("submit", async (ev) => {
 		ev.preventDefault();
 
+		userlist_container.style.visibility = "visible";
+
 		const res = await fetch("http://localhost:7000/searchFriend", {
 			method: "post",
 			headers: {
@@ -62,12 +64,12 @@
 				const div = document.createElement("div");
 
 				div.innerHTML = `
-					<div class="user">
-						<div class="user_name">${user.username}</div>
-						<div class="user_id">#${user.id}</div>
-						<div class="add-button">+</div>
-					</div>
-				`;
+						<div class="user">
+							<div class="user_name">${user.username}</div>
+							<div class="user_id">#${user.id}</div>
+							<div class="add-button">add friend</div>
+						</div>
+					`;
 
 				userlist_container.append(div);
 			});
@@ -75,16 +77,31 @@
 
 		const addFriendButtons = document.querySelectorAll(".add-button");
 
-		addFriendButtons.forEach((btn) =>
+		addFriendButtons.forEach((btn) => {
 			btn.addEventListener("click", async (ev) => {
-				const username = ev.target.parentElement.querySelector(".user_name");
-				const userId = ev.target.parentElement.querySelector(".user_id");
+				const username = ev.target.parentElement.querySelector(".user_name").textContent;
+				const userId = ev.target.parentElement.querySelector(".user_id").textContent.slice(1);
 
-				// const res = await fetch("http://localhost:7000/");
-			}),
-		);
+				if (btn.textContent === "add friend") {
+					btn.classList.add("pending");
+					btn.textContent = "pending";
 
-		console.log(data);
+					const res = await fetch("http://localhost:7000/addfriend", {
+						method: "post",
+						headers: {
+							"content-type": "application/json",
+						},
+						body: JSON.stringify({
+							userName: username,
+							userId: userId,
+						}),
+					});
+				} else {
+					btn.classList.remove("pending");
+					btn.textContent = "add friend";
+				}
+			});
+		});
 	});
 </script>
 
@@ -112,6 +129,10 @@
 		border: 1px solid gray;
 	}
 
+	.content {
+		width: 400px;
+	}
+
 	.userlist-container {
 		border: 1px solid gray;
 		border-radius: 0.3rem;
@@ -129,12 +150,13 @@
 
 	.add-button {
 		margin-left: auto;
-		padding: 0px 5px;
+		padding: 2px 5px;
 		background-color: gray;
-		border-radius: 50%;
+		border-radius: 5px;
 		cursor: pointer;
 		display: grid;
 		place-items: center;
+		transition: 100ms;
 	}
 
 	.add-button:hover {
@@ -144,5 +166,13 @@
 	.user_id {
 		margin-left: 5px;
 		color: gray;
+	}
+
+	.pending {
+		background-color: greenyellow;
+	}
+
+	.pending:hover {
+		background-color: rgb(153, 255, 0);
 	}
 </style>

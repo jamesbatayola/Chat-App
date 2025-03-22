@@ -1,5 +1,5 @@
 import kleur from "kleur";
-import { searchFriend } from "../services/home/searchFriend.js";
+import { searchFriend, addFriend } from "../services/home/searchFriend.js";
 import { getWsServer } from "../services/webSocket.js";
 
 const getHome = async (req, res, next) => {
@@ -40,4 +40,17 @@ const postSearchFriend = async (req, res, next) => {
 	}
 };
 
-export default { getHome, getSearchFriend, postSearchFriend };
+const postAddFriend = async (req, res, next) => {
+	try {
+		const res = addFriend(req);
+
+		res.status(200).json({
+			status: "success",
+			message: `${req.body.userName} is added`,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export default { getHome, getSearchFriend, postSearchFriend, postAddFriend };

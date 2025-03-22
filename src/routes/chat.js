@@ -9,4 +9,6 @@ router.get("/home", jwtAuth, chatController.getHome);
 router.get("/searchfriend", jwtAuth, chatController.getSearchFriend);
 router.post("/searchfriend", jwtAuth, chatController.postSearchFriend);
 
+router.post("/addfriend", jwtAuth, chatController.postAddFriend);
+
 export default router;
