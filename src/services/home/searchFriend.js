@@ -1,6 +1,6 @@
 import kleur from "kleur";
 import User from "../../models/user.js";
-import { number } from "zod";
+
 import { Op } from "sequelize";
 
 export const searchFriend = async (requestBody) => {

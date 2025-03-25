@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<div class="container">
+			<div class="content">
+				<h1>Friend Request</h1>
+
+				<div class="addedYou-container">
+					<h3>Added you</h3>
+					<% if(addedYou.length <= 0) { %>
+					<p>No one loves you</p>
+					<% } else { %> <% addedYou.forEach(each => { %>
+					<div class="added-pending">
+						<div class="credential"><%= each.username %></div>
+						<div class="credential">#<%= each.id %></div>
+						<button class="button accept-button">Accept</button>
+					</div>
+					<% }) %> <% } %>
+				</div>
+				<div class="pending-container">
+					<h3>Pending</h3>
+					<% if(pendingAdded.length <= 0) { %>
+					<p>0 pendings</p>
+					<% } else { %> <% pendingAdded.forEach(each => { %>
+					<div class="added-pending">
+						<div class="credential"><%= each.username %></div>
+						<div class="credential">#<%= each.id %></div>
+						<button class="button cancel-button">Cancel</button>
+					</div>
+					<% }) %> <% } %>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script></script>
+
+<style>
+	*,
+	body {
+		padding: 0;
+		margin: 0;
+		box-sizing: border-box;
+	}
+
+	.container {
+		border: 1px solid black;
+		display: grid;
+		place-items: center;
+		height: 100vh;
+	}
+
+	.content {
+		border: 1px solid black;
+		width: 450px;
+		padding: 0.7rem;
+		border-radius: 0.5rem;
+	}
+
+	h1 {
+		border-bottom: 1px solid gray;
+	}
+
+	.credential {
+		display: grid;
+		place-items: center;
+	}
+
+	button {
+		padding: 5px;
+	}
+
+	button {
+		margin-left: auto;
+	}
+
+	.addedYou-container,
+	.pending-container {
+		min-height: 50px;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.addedYou-container {
+		border-bottom: 1px solid gray;
+		padding-bottom: 7px;
+	}
+
+	.added-pending {
+		border: 1px solid gray;
+		border-radius: 5px;
+		padding: 7px 5px;
+		display: flex;
+		gap: 0.5rem;
+	}
+</style>

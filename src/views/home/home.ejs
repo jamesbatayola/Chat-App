@@ -11,7 +11,7 @@
 				<div class="friends-list">
 					<% if(friends.length <= 0) { %>
 
-					<div class="friend">You have no friend</div>
+					<p style="text-align: center">You have no friend</p>
 
 					<% } else { %> <% for(let friend of friends) { %>
 					<div class="friend">
@@ -31,12 +31,17 @@
 
 <script type="module">
 	const friends = document.querySelectorAll(".friend");
+	const friendRequest = document.querySelector(".friend-request");
 	const searchFriend = document.querySelector(".search-friend");
 
 	friends.forEach((friend) => {
 		friend.addEventListener("click", async (ev) => {
 			console.log("HELLO WORLD");
 		});
+	});
+
+	friendRequest.addEventListener("click", (ev) => {
+		window.location.href = `http://localhost:7000/friendRequest`;
 	});
 
 	searchFriend.addEventListener("click", async (ev) => {
@@ -109,7 +114,8 @@
 		flex-grow: 1;
 	}
 
-	.seach-friend:hover {
+	.search-friend:hover,
+	.friend-request:hover {
 		background-color: rgb(195, 195, 195);
 	}
 </style>
