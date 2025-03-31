@@ -1,5 +1,6 @@
 import kleur from "kleur";
 import { searchFriend, addFriend } from "../services/home/searchFriend.js";
+import { showPending, showAdded } from "../services/home/friendRequest.js";
 import { getWsServer } from "../services/webSocket.js";
 import { where } from "sequelize";
 import User from "../models/user.js";
@@ -29,25 +30,13 @@ const getHome = async (req, res, next) => {
 
 const getFriendRequest = async (req, res, next) => {
 	try {
-		const pendingAdded = await req.user.getFriends({
-			through: { where: { status: "pending" } },
-		});
+		const show_pendings = await showPending(req);
 
-		// junction rows
-		const addedYou = await Friendship.findAll({
-			where: { friendId: req.user.id },
-		});
-
-		// users
-		const _addedYou = await Promise.all(
-			addedYou.map(async (e) => {
-				return await User.findByPk(e.userId);
-			}),
-		);
+		const show_who_added_you = await showAdded(req);
 
 		res.render("home/friend_request", {
-			pendingAdded: pendingAdded,
-			addedYou: _addedYou,
+			pendingAdded: show_pendings,
+			addedYou: show_who_added_you,
 		});
 	} catch (err) {
 		next(err);
@@ -62,7 +51,7 @@ const getSearchFriend = async (req, res, next) => {
 
 const postSearchFriend = async (req, res, next) => {
 	try {
-		const users = await searchFriend(req.body);
+		const users = await searchFriend(req);
 
 		res.status(200).json({
 			users,

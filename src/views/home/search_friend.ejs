@@ -14,7 +14,7 @@
 						<label for="username">Username</label>
 						<input class="username-input" type="text" name="username" />
 					</div>
-					<button>Search</button>
+					<button class="search-button">Search</button>
 					<hr />
 					<p>Your id: <span class="myID"><%= user.id %></span></p>
 				</form>
@@ -33,8 +33,6 @@
 <script type="module">
 	const username_input = document.querySelector(".username-input");
 	const myID = document.querySelector(".myID").textContent;
-
-	console.log(myID);
 
 	const userlist_container = document.querySelector(".userlist-container");
 
@@ -56,6 +54,8 @@
 
 		const data = await res.json();
 
+		// ------------- USER LIST CONTAINER ------------- //
+
 		if (data.message === "No user found") {
 			userlist_container.innerHTML = `<h2>${data.message}</h2>`;
 		} else {
@@ -67,7 +67,8 @@
 						<div class="user">
 							<div class="user_name">${user.username}</div>
 							<div class="user_id">#${user.id}</div>
-							<div class="add-button">add friend</div>
+							<div hidden ></div>
+							<button id="interact-button" class="${user.status}" > ${user.status} </button>
 						</div>
 					`;
 
@@ -75,30 +76,32 @@
 			});
 		}
 
-		const addFriendButtons = document.querySelectorAll(".add-button");
+		const addFriendButtons = document.querySelectorAll("#interact-button");
 
 		addFriendButtons.forEach((btn) => {
+			const username = ev.target.parentElement.querySelector(".user_name").textContent;
+			const userId = ev.target.parentElement.querySelector(".user_id").textContent.slice(1);
+
 			btn.addEventListener("click", async (ev) => {
-				const username = ev.target.parentElement.querySelector(".user_name").textContent;
-				const userId = ev.target.parentElement.querySelector(".user_id").textContent.slice(1);
+				ev.preventDefault();
 
-				if (btn.textContent === "add friend") {
-					btn.classList.add("pending");
-					btn.textContent = "pending";
+				if (btn.textContent === "Add") {
+					btn.classList.add("Cancel");
+					btn.textContent = "Cancel";
 
-					const res = await fetch("http://localhost:7000/addfriend", {
-						method: "post",
-						headers: {
-							"content-type": "application/json",
-						},
-						body: JSON.stringify({
-							userName: username,
-							userId: userId,
-						}),
-					});
+					// const res = await fetch("http://localhost:7000/addfriend", {
+					// 	method: "post",
+					// 	headers: {
+					// 		"content-type": "application/json",
+					// 	},
+					// 	body: JSON.stringify({
+					// 		userName: username,
+					// 		userId: userId,
+					// 	}),
+					// });
 				} else {
-					btn.classList.remove("pending");
-					btn.textContent = "add friend";
+					// btn.classList.remove("Cancel");
+					// btn.textContent = "Add";
 				}
 			});
 		});
@@ -148,31 +151,43 @@
 		border: 1px solid gray;
 	}
 
-	.add-button {
-		margin-left: auto;
-		padding: 2px 5px;
-		background-color: gray;
-		border-radius: 5px;
-		cursor: pointer;
-		display: grid;
-		place-items: center;
-		transition: 100ms;
-	}
-
-	.add-button:hover {
-		background-color: rgb(37, 37, 37);
-	}
-
 	.user_id {
 		margin-left: 5px;
 		color: gray;
 	}
 
-	.pending {
-		background-color: greenyellow;
+	#interact-button {
+		border: none;
+		margin-left: auto;
+		padding: 5px 7px;
+		border-radius: 5px;
+		cursor: pointer;
+		display: grid;
+		place-items: center;
+		transition: 200ms;
 	}
 
-	.pending:hover {
+	.Add {
+		background-color: skyblue;
+	}
+
+	.Add:hover {
+		background-color: rgb(15, 180, 246);
+	}
+
+	.Accept {
+		background-color: rgb(193, 255, 100);
+	}
+
+	.Accept:hover {
 		background-color: rgb(153, 255, 0);
+	}
+
+	.Cancel {
+		background-color: pink;
+	}
+
+	.Cancel:hover {
+		background-color: rgb(255, 28, 66);
 	}
 </style>
