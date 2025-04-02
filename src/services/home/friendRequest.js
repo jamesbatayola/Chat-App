@@ -26,6 +26,24 @@ export const showAdded = async (req) => {
 	return addedYou;
 };
 
-export const acceptRequest = (req) => {};
+export const acceptFriendRequest = (req) => {};
 
-export const cancelRequest = (req) => {};
+export const cancelFriendRequest = async (req) => {
+	const { pending_user_id } = req.body;
+
+	const user_to_cancel = await Friendship.findOne({
+		where: { userId: req.user.id, friendId: pending_user_id },
+	});
+
+	if (!user_to_cancel) {
+		const err = new Error("User to be delete does not exist");
+		err.statusCode = 404;
+		throw err;
+	}
+
+	await user_to_cancel.destroy();
+
+	return {
+		status: "success",
+	};
+};

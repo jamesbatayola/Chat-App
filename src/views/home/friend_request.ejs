@@ -25,11 +25,11 @@
 				<div class="pending-container">
 					<h3>Pending</h3>
 					<% if(pendingAdded.length <= 0) { %>
-					<p>0 pendings</p>
+					<p>0 :(</p>
 					<% } else { %> <% pendingAdded.forEach(each => { %>
 					<div class="added-pending">
-						<div class="credential"><%= each.username %></div>
-						<div class="credential">#<%= each.id %></div>
+						<div class="credential pending-userName"><%= each.username %></div>
+						<div class="credential pending-userId">#<%= each.id %></div>
 						<button class="button cancel-button">Cancel</button>
 					</div>
 					<% }) %> <% } %>
@@ -39,7 +39,39 @@
 	</body>
 </html>
 
-<script></script>
+<script>
+	const cancel_buttons = document.querySelectorAll(".cancel-button");
+	const pending_container = document.querySelector(".pending-container");
+
+	cancel_buttons.forEach((btn) => {
+		btn.addEventListener("click", async (ev) => {
+			ev.preventDefault();
+
+			const pending_user_id = ev.target.parentElement.children[1].textContent.substring(1);
+
+			const cancel_request_result = await fetch(`http://localhost:7000/friendRequest/cancel`, {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					pending_user_id: pending_user_id,
+				}),
+			});
+
+			const data = await cancel_request_result.json();
+
+			if (data.status === "success") {
+				ev.target.parentElement.remove();
+				if (pending_container.children.length === 1) {
+					const div = document.createElement("div");
+					div.innerHTML = "<p>0 :(</p>";
+					pending_container.appendChild(div);
+				}
+			}
+		});
+	});
+</script>
 
 <style>
 	*,

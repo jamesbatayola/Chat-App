@@ -1,6 +1,6 @@
 import kleur from "kleur";
 import { searchFriend, addFriend } from "../services/home/searchFriend.js";
-import { showPending, showAdded } from "../services/home/friendRequest.js";
+import { showPending, showAdded, cancelFriendRequest } from "../services/home/friendRequest.js";
 import { getWsServer } from "../services/webSocket.js";
 import { where } from "sequelize";
 import User from "../models/user.js";
@@ -63,7 +63,7 @@ const postSearchFriend = async (req, res, next) => {
 
 const postAddFriend = async (req, res, next) => {
 	try {
-		const res = addFriend(req);
+		const addFriendRes = addFriend(req);
 
 		res.status(200).json({
 			status: "success",
@@ -74,4 +74,24 @@ const postAddFriend = async (req, res, next) => {
 	}
 };
 
-export default { getHome, getFriendRequest, getSearchFriend, postSearchFriend, postAddFriend };
+const postCancelRequest = async (req, res, next) => {
+	try {
+		const cancelFreindRequestRes = cancelFriendRequest(req);
+
+		res.status(200).json({
+			status: "success",
+			messge: `Successfully cancel friend request`,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+export default {
+	getHome,
+	getFriendRequest,
+	getSearchFriend,
+	postSearchFriend,
+	postAddFriend,
+	postCancelRequest,
+};

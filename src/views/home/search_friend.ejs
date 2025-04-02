@@ -76,32 +76,51 @@
 			});
 		}
 
-		const addFriendButtons = document.querySelectorAll("#interact-button");
+		const interact_buttons = document.querySelectorAll("#interact-button");
 
-		addFriendButtons.forEach((btn) => {
-			const username = ev.target.parentElement.querySelector(".user_name").textContent;
-			const userId = ev.target.parentElement.querySelector(".user_id").textContent.slice(1);
+		interact_buttons.forEach((btn) => {
+			const user_name = ev.target.parentElement.querySelector(".user_name").textContent;
+			const user_id = ev.target.parentElement.querySelector(".user_id").textContent.substring(1);
 
 			btn.addEventListener("click", async (ev) => {
 				ev.preventDefault();
 
-				if (btn.textContent === "Add") {
+				if (btn.textContent.trim() === "Add") {
 					btn.classList.add("Cancel");
 					btn.textContent = "Cancel";
 
-					// const res = await fetch("http://localhost:7000/addfriend", {
-					// 	method: "post",
-					// 	headers: {
-					// 		"content-type": "application/json",
-					// 	},
-					// 	body: JSON.stringify({
-					// 		userName: username,
-					// 		userId: userId,
-					// 	}),
-					// });
-				} else {
-					// btn.classList.remove("Cancel");
-					// btn.textContent = "Add";
+					// ------- ADD FRIEND ------- //
+
+					const addfriend_result = await fetch("http://localhost:7000/addfriend", {
+						method: "POST",
+						headers: {
+							"content-type": "application/json",
+						},
+						body: JSON.stringify({
+							userName: user_name,
+							userId: user_id,
+						}),
+					});
+
+					const data = await addfriend_result.json();
+
+					console.log(data);
+				} else if (btn.textContent.trim() === "Cancel") {
+					// ------- CANCEl FRIEND ------- //
+
+					const cancel_request_result = await fetch("http://localhost:7000/addfriend-cancel", {
+						method: "POST",
+						headers: {
+							"content-type": "application/json",
+						},
+						body: JSON.stringify({
+							user_name: username,
+							user_id: userId,
+						}),
+					});
+
+					btn.classList.remove("Cancel");
+					btn.textContent = "Add";
 				}
 			});
 		});
