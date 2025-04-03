@@ -14,19 +14,19 @@ export const wsInit = async (server) => {
 	wss = new WebSocketServer({ server });
 
 	// listens for incoming web connections
-	wss.on("connection", (ws) => {
-		// send message to client who connects
-		ws.send("You are connect to WebSocket Server");
+	// wss.on("connection", (ws) => {
+	// 	// send message to client who connects
+	// 	ws.send("You are connect to WebSocket Server");
 
-		// listener for new comers
-		ws.on("message", (message) => {
-			console.log(kleur.bgGreen(`Recieved ${message}`));
-		});
+	// 	// listener for new comers
+	// 	ws.on("message", (message) => {
+	// 		console.log(kleur.bgGreen(`Recieved ${message}`));
+	// 	});
 
-		ws.on("close", () => {
-			console.log(kleur.bgRed("User diconnects"));
-		});
-	});
+	// 	ws.on("close", () => {
+	// 		console.log(kleur.bgRed("User diconnects"));
+	// 	});
+	// });
 
 	return wss;
 };

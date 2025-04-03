@@ -2,6 +2,7 @@ import kleur from "kleur";
 import User from "../../models/user.js";
 import { Op } from "sequelize";
 import Friendship from "../../models/friendship.js";
+import { getWsServer } from "../../public/ws.js";
 
 export const searchFriend = async (req) => {
 	const { username, myID } = req.body;
@@ -19,8 +20,6 @@ export const searchFriend = async (req) => {
 		err.status = "failed";
 		throw err;
 	}
-
-	// const friendships = await req.user.getFreinds();
 
 	const connectedFriends = await req.user.getFriends(); // returns an array
 
@@ -60,9 +59,30 @@ export const addFriend = async (req) => {
 		throw err;
 	}
 
-	const friendToAdd = await User.findByPk(userId);
+	const user_to_add = await User.findByPk(userId);
 
-	await user.addFriend(friendToAdd);
+	await user.addFriend(user_to_add);
+
+	const wss = getWsServer();
+
+	// notify the user you added
+	wss.clients.forEach((client) => {
+		if (client.readState === wss.OPEN) {
+			client.send(
+				JSON.stringify({
+					type: "addfriend",
+					from: {
+						id: user.id,
+						username: user.username,
+					},
+					recipient: {
+						id: user_to_add.id,
+						username: user_to_add.username,
+					},
+				}),
+			);
+		}
+	});
 
 	return;
 };

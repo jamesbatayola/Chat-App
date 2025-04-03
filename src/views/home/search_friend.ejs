@@ -86,9 +86,6 @@
 				ev.preventDefault();
 
 				if (btn.textContent.trim() === "Add") {
-					btn.classList.add("Cancel");
-					btn.textContent = "Cancel";
-
 					// ------- ADD FRIEND ------- //
 
 					const addfriend_result = await fetch("http://localhost:7000/addfriend", {
@@ -102,9 +99,8 @@
 						}),
 					});
 
-					const data = await addfriend_result.json();
-
-					console.log(data);
+					btn.classList.add("Cancel");
+					btn.textContent = "Cancel";
 				} else if (btn.textContent.trim() === "Cancel") {
 					// ------- CANCEl FRIEND ------- //
 
@@ -114,10 +110,12 @@
 							"content-type": "application/json",
 						},
 						body: JSON.stringify({
-							user_name: username,
-							user_id: userId,
+							pending_user_id: user_id,
 						}),
 					});
+
+					const data = await cancel_request_result.json();
+					console.log(data);
 
 					btn.classList.remove("Cancel");
 					btn.textContent = "Add";

@@ -1,7 +1,7 @@
 import kleur from "kleur";
 import { searchFriend, addFriend } from "../services/home/searchFriend.js";
 import { showPending, showAdded, cancelFriendRequest } from "../services/home/friendRequest.js";
-import { getWsServer } from "../services/webSocket.js";
+import { getWsServer } from "../public/ws.js";
 import { where } from "sequelize";
 import User from "../models/user.js";
 import Friendship from "../models/friendship.js";
@@ -35,6 +35,7 @@ const getFriendRequest = async (req, res, next) => {
 		const show_who_added_you = await showAdded(req);
 
 		res.render("home/friend_request", {
+			my_id: req.user.id,
 			pendingAdded: show_pendings,
 			addedYou: show_who_added_you,
 		});
@@ -76,7 +77,7 @@ const postAddFriend = async (req, res, next) => {
 
 const postCancelRequest = async (req, res, next) => {
 	try {
-		const cancelFreindRequestRes = cancelFriendRequest(req);
+		cancelFriendRequest(req);
 
 		res.status(200).json({
 			status: "success",

@@ -74,7 +74,7 @@ app.use((error, req, res, next) => {
 // --------- STARTS SERVER --------- //
 
 import { runServer } from "./services/server.js";
-import { wsInit } from "./services/webSocket.js";
+import { wsInit } from "./public/ws.js";
 
 try {
 	const sync = await sequelize.sync();

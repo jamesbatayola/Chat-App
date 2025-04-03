@@ -9,29 +9,49 @@
 		<div class="container">
 			<div class="content">
 				<h1>Friend Request</h1>
+				<input class="my-id" type="text" hidden value="<%= my_id %>" />
 
-				<div class="addedYou-container">
-					<h3>Added you</h3>
+				<hr />
+
+				<h3>Added you</h3>
+
+				<div class="pending-container add-you-container">
 					<% if(addedYou.length <= 0) { %>
-					<p>No one loves you</p>
+
+					<div class="user-request-container null-placeholder">
+						<p>No one added you</p>
+					</div>
+
 					<% } else { %> <% addedYou.forEach(each => { %>
-					<div class="added-pending">
-						<div class="credential"><%= each.username %></div>
-						<div class="credential">#<%= each.id %></div>
+
+					<div class="user-request-container add-you <%= each.id %>">
+						<div class="credential request-username"><%= each.username %></div>
+						<div class="credential request-userid">#<%= each.id %></div>
 						<button class="button accept-button">Accept</button>
 					</div>
+
 					<% }) %> <% } %>
 				</div>
-				<div class="pending-container">
-					<h3>Pending</h3>
+
+				<hr />
+
+				<h3>Pending</h3>
+
+				<div class="pending-container you-add-container">
 					<% if(pendingAdded.length <= 0) { %>
-					<p>0 :(</p>
+
+					<div class="user-request-container null-placeholder">
+						<p>You added no one</p>
+					</div>
+
 					<% } else { %> <% pendingAdded.forEach(each => { %>
-					<div class="added-pending">
-						<div class="credential pending-userName"><%= each.username %></div>
-						<div class="credential pending-userId">#<%= each.id %></div>
+
+					<div class="user-request-container you-add">
+						<div class="credential request-username"><%= each.username %></div>
+						<div class="credential request-userid">#<%= each.id %></div>
 						<button class="button cancel-button">Cancel</button>
 					</div>
+
 					<% }) %> <% } %>
 				</div>
 			</div>
@@ -39,17 +59,19 @@
 	</body>
 </html>
 
-<script>
-	const cancel_buttons = document.querySelectorAll(".cancel-button");
-	const pending_container = document.querySelector(".pending-container");
+<script type="module">
+	const youadd_container = document.querySelector(".you-add-container");
+	const addyou_container = document.querySelector(".add-you-container");
+	const my_id = document.querySelector(".my-id");
 
+	const cancel_buttons = document.querySelectorAll(".cancel-button");
 	cancel_buttons.forEach((btn) => {
 		btn.addEventListener("click", async (ev) => {
 			ev.preventDefault();
 
 			const pending_user_id = ev.target.parentElement.children[1].textContent.substring(1);
 
-			const cancel_request_result = await fetch(`http://localhost:7000/friendRequest/cancel`, {
+			const cancel_request_result = await fetch("http://localhost:7000/addfriend-cancel", {
 				method: "POST",
 				headers: {
 					"content-type": "application/json",
@@ -62,15 +84,71 @@
 			const data = await cancel_request_result.json();
 
 			if (data.status === "success") {
-				ev.target.parentElement.remove();
-				if (pending_container.children.length === 1) {
-					const div = document.createElement("div");
-					div.innerHTML = "<p>0 :(</p>";
-					pending_container.appendChild(div);
+				if (youadd_container.children.length === 1) {
+					youadd_container.innerHTML = `
+							<div class="user-request-container">
+								<p>You added no one</p>
+							</div>
+						`;
+				} else {
+					ev.target.parentElement.remove();
 				}
 			}
 		});
 	});
+
+	// ----- WEB SOCKET ----- //
+	const ws = new WebSocket(`ws://localhost:7000`);
+
+	console.log(addyou_container.querySelector(`[class~="2BA5"]`));
+
+	ws.onmessage = (ev) => {
+		const json_data = JSON.parse(ev.data);
+
+		const from = json_data.from;
+		const recipient = json_data.recipient;
+
+		if (recipient.id === my_id.value) {
+			//
+			if (json_data.type === "addfriend") {
+				//
+				if (addyou_container.firstElementChild?.classList.contains("null-placeholder")) {
+					addyou_container.firstElementChild.remove();
+				}
+
+				const div = document.createElement("div");
+
+				div.innerHTML = `
+						<div class="user-request-container add-you ${from.id}">
+							<div class="credential request-username">${from.username}</div>
+							<div class="credential request-userid">#${from.id}</div>
+							<button class="button accept-button">Accept</button>
+						</div>
+					`;
+
+				addyou_container.append(div);
+
+				return;
+			}
+
+			if (json_data.type === "cancel_request") {
+				//
+				if (addyou_container.children.length === 1) {
+					addyou_container.innerHTML = `
+						<div class="user-request-container null-placeholder">
+							<p>No one added you</p>
+						</div>
+					`;
+
+					return;
+				}
+
+				addyou_container.querySelector(`[class~="${from.id}"]`).remove();
+
+				return;
+			}
+		}
+	};
 </script>
 
 <style>
@@ -96,7 +174,7 @@
 	}
 
 	h1 {
-		border-bottom: 1px solid gray;
+		padding-bottom: 0.4rem;
 	}
 
 	.credential {
@@ -112,7 +190,6 @@
 		margin-left: auto;
 	}
 
-	.addedYou-container,
 	.pending-container {
 		min-height: 50px;
 		display: flex;
@@ -120,16 +197,20 @@
 		gap: 4px;
 	}
 
-	.addedYou-container {
-		border-bottom: 1px solid gray;
-		padding-bottom: 7px;
+	.pending-container:first-of-type {
+		/* border-bottom: 1px solid gray; */
+		padding-bottom: 12px;
 	}
 
-	.added-pending {
+	.user-request-container {
 		border: 1px solid gray;
 		border-radius: 5px;
 		padding: 7px 5px;
 		display: flex;
 		gap: 0.5rem;
+	}
+
+	.request-userid {
+		color: rgb(174, 174, 174);
 	}
 </style>

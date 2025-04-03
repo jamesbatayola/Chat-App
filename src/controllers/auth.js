@@ -1,7 +1,7 @@
 import kleur from "kleur";
 import { createUser, loginUser } from "../services/authentication/authPage.js";
 import { getServer } from "../services/server.js";
-import { wsInit, getWsServer } from "../services/webSocket.js";
+import { wsInit, getWsServer } from "../public/ws.js";
 
 const getLogin = async (req, res, next) => {
 	res.render("auth/login");
