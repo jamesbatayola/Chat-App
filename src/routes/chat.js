@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/home", jwtAuth, chatController.getHome);
 
 router.get("/friendRequest", jwtAuth, chatController.getFriendRequest);
+router.post("/friendRequest/accept", jwtAuth, chatController.postAcceptRequest);
 
 router.get("/searchfriend", jwtAuth, chatController.getSearchFriend);
 router.post("/searchfriend", jwtAuth, chatController.postSearchFriend);

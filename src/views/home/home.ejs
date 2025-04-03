@@ -50,11 +50,12 @@
 
 	// ------- WEB SOCKET ------- //
 
-	// const ws = new WebSocket("ws://localhost:7000");
+	const ws = new WebSocket("ws://localhost:7000");
 
-	// ws.onmessage = (ev) => {
-	// 	console.log(ev.data);
-	// };
+	ws.onmessage = (ev) => {
+		if (ev.data.type === "addfriend") {
+		}
+	};
 </script>
 
 <style>

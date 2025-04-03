@@ -14,7 +14,7 @@ export const showPending = async (req) => {
 export const showAdded = async (req) => {
 	// junction rows
 	const friendships = await Friendship.findAll({
-		where: { friendId: req.user.id },
+		where: { friendId: req.user.id, status: "pending" },
 	});
 
 	// users
@@ -27,7 +27,46 @@ export const showAdded = async (req) => {
 	return addedYou;
 };
 
-export const acceptFriendRequest = (req) => {};
+export const acceptFriendRequest = async (req) => {
+	const { userid, username } = req.body;
+
+	console.log(kleur.bgYellow("START"));
+
+	const friend_to_accept = await User.findByPk(userid);
+
+	if (!friend_to_accept) {
+		const err = new Error("user does not exist in the database");
+		err.statusCode = 404;
+		throw err;
+	}
+
+	// activate friendship
+	await req.user.addFriend(friend_to_accept, { through: { status: "accepted" } });
+
+	// verify if friends already
+	// const user_friend = await req.user.getFriends({ where: { id: userid } }); // returns array instance
+
+	// if (user_friend.length > 0) {
+	// 	const err = new Error("already friends");
+	// 	err.statusCode = 409;
+	// 	throw err;
+	// }
+
+	const friend = await Friendship.findOne({
+		where: {
+			userId: friend_to_accept.id,
+			friendId: req.user.id,
+		},
+	});
+
+	if (friend) {
+		friend.status = "accepted";
+
+		await friend.save();
+	}
+
+	return;
+};
 
 export const cancelFriendRequest = async (req) => {
 	const { pending_user_id } = req.body;

@@ -7,6 +7,8 @@ import { getWsServer } from "../../public/ws.js";
 export const searchFriend = async (req) => {
 	const { username, myID } = req.body;
 
+	const isFriend = req.user.getFriends({ where: { username: username } });
+
 	const findUsers = await User.findAll({
 		where: {
 			username: username,

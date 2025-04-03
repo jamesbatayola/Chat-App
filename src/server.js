@@ -77,6 +77,7 @@ import { runServer } from "./services/server.js";
 import { wsInit } from "./public/ws.js";
 
 try {
+	// const _sync = await sequelize.sync({ force: true });
 	const sync = await sequelize.sync();
 
 	// RUNS THE NODE AND WEBSOCKET SERVER

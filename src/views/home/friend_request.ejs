@@ -97,34 +97,86 @@
 		});
 	});
 
+	const Accept_Button = async (button, payload) => {
+		button.addEventListener("click", async (ev) => {
+			ev.preventDefault();
+
+			const accept_request_result = await fetch(`http://localhost:7000/friendRequest/accept`, {
+				method: "POST",
+				headers: {
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					userid: payload.userid,
+					username: payload.username,
+				}),
+			});
+
+			const data = await accept_request_result.json();
+
+			if (data.status === "success") {
+				if (addyou_container.children.length === 1) {
+					addyou_container.innerHTML = `
+						<div class="user-request-container null-placeholder">
+							<p>No one added you</p>
+						</div>
+					`;
+
+					return;
+				}
+
+				addyou_container.querySelector(`[class~="${payload.userid}"]`).remove();
+			}
+		});
+	};
+
+	document.querySelectorAll(".accept-button").forEach((button) => {
+		const userid = button.parentElement.children[1].textContent.substring(1);
+		const username = button.parentElement.children[0].textContent;
+
+		const payload = {
+			userid: userid,
+			username: username,
+		};
+
+		Accept_Button(button, payload);
+	});
+
 	// ----- WEB SOCKET ----- //
 	const ws = new WebSocket(`ws://localhost:7000`);
 
-	console.log(addyou_container.querySelector(`[class~="2BA5"]`));
-
-	ws.onmessage = (ev) => {
+	ws.onmessage = async (ev) => {
 		const json_data = JSON.parse(ev.data);
 
 		const from = json_data.from;
 		const recipient = json_data.recipient;
 
+		const payload = {
+			userid: json_data.from.id,
+			username: json_data.from.username,
+		};
+
 		if (recipient.id === my_id.value) {
 			//
 			if (json_data.type === "addfriend") {
 				//
-				if (addyou_container.firstElementChild?.classList.contains("null-placeholder")) {
+				if (addyou_container.firstElementChild.classList.contains("null-placeholder")) {
 					addyou_container.firstElementChild.remove();
 				}
 
 				const div = document.createElement("div");
 
 				div.innerHTML = `
-						<div class="user-request-container add-you ${from.id}">
-							<div class="credential request-username">${from.username}</div>
-							<div class="credential request-userid">#${from.id}</div>
+						<div class="user-request-container add-you ${payload.userid}">
+							<div class="credential request-username">${payload.username}</div>
+							<div class="credential request-userid">#${payload.userid}</div>
 							<button class="button accept-button">Accept</button>
 						</div>
 					`;
+
+				const button = div.querySelector(["accept-button"]);
+
+				await Accept_Button(button, payload);
 
 				addyou_container.append(div);
 

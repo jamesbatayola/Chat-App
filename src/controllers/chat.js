@@ -1,6 +1,11 @@
 import kleur from "kleur";
 import { searchFriend, addFriend } from "../services/home/searchFriend.js";
-import { showPending, showAdded, cancelFriendRequest } from "../services/home/friendRequest.js";
+import {
+	showPending,
+	showAdded,
+	cancelFriendRequest,
+	acceptFriendRequest,
+} from "../services/home/friendRequest.js";
 import { getWsServer } from "../public/ws.js";
 import { where } from "sequelize";
 import User from "../models/user.js";
@@ -88,6 +93,19 @@ const postCancelRequest = async (req, res, next) => {
 	}
 };
 
+const postAcceptRequest = async (req, res, next) => {
+	try {
+		acceptFriendRequest(req);
+
+		res.status(200).json({
+			status: "success",
+			message: "successfully accepted friend request",
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
 export default {
 	getHome,
 	getFriendRequest,
@@ -95,4 +113,5 @@ export default {
 	postSearchFriend,
 	postAddFriend,
 	postCancelRequest,
+	postAcceptRequest,
 };
