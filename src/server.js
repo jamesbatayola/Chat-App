@@ -50,7 +50,11 @@ import authRoute from "./routes/auth.js";
 import chatRoute from "./routes/chat.js";
 
 // --------- MIDDLEWARES --------- //
-app.use(cors());
+app.use(
+	cors({
+		credentials: true, // crucial: allows cookies to be accepted
+	}),
+);
 
 app.use(express.static(path.join(__dirname, "public"))); // serves static files
 
@@ -76,9 +80,13 @@ app.use((error, req, res, next) => {
 import { runServer } from "./services/server.js";
 import { wsInit } from "./public/ws.js";
 
+// MIGRATION //
+import db from "../models/Index.js";
+
 try {
 	// const _sync = await sequelize.sync({ force: true });
-	const sync = await sequelize.sync();
+	// const sync = await sequelize.sync();
+	await db.sequelize.authenticate();
 
 	// RUNS THE NODE AND WEBSOCKET SERVER
 	const nodeServer = await runServer(app, PORT);

@@ -14,8 +14,14 @@ const postLogin = async (req, res, next) => {
 
 		// Storing JWT token via HttpOnly cookie
 		res.cookie("token", payload.token, {
-			httOnly: true, // XSS protection
+			httpOnly: true, // XSS protection
 			sameSite: "Strict", // SRF protection
+			maxAge: 3600000, // 1 hour expiration
+		});
+
+		res.cookie("user_id", payload.user.id, {
+			sameSite: "Strict",
+			secure: false,
 			maxAge: 3600000, // 1 hour expiration
 		});
 

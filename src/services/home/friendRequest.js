@@ -43,15 +43,6 @@ export const acceptFriendRequest = async (req) => {
 	// activate friendship
 	await req.user.addFriend(friend_to_accept, { through: { status: "accepted" } });
 
-	// verify if friends already
-	// const user_friend = await req.user.getFriends({ where: { id: userid } }); // returns array instance
-
-	// if (user_friend.length > 0) {
-	// 	const err = new Error("already friends");
-	// 	err.statusCode = 409;
-	// 	throw err;
-	// }
-
 	const friend = await Friendship.findOne({
 		where: {
 			userId: friend_to_accept.id,
@@ -64,6 +55,28 @@ export const acceptFriendRequest = async (req) => {
 
 		await friend.save();
 	}
+
+	// ----- notify (websocket) ----- //
+
+	const ws = getWsServer();
+
+	ws.clients.forEach((client) => {
+		if (client.readState === ws.OPEN) {
+			client.send(
+				JSON.stringify({
+					type: "accept_request",
+					from: {
+						id: req.user.id,
+						username: req.user.username,
+					},
+					recipient: {
+						id: userid,
+						username: username,
+					},
+				}),
+			);
+		}
+	});
 
 	return;
 };
