@@ -20,30 +20,33 @@ const __dirname = path.dirname(__filename);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// --------- MODELS --------- //
-import User from "./models/user.js";
-import Message from "./models/message.js";
-import ChatRoom from "./models/chatRoom.js";
-import ChatMember from "./models/chatMember.js";
-import Friendship from "./models/friendship.js";
+// --------- MIGRATED MODELS --------- //
+import db from "../models/Index.js";
 
-// Always define foreignKey and otherKey explicitly
-// when doing self-referencing many-to-many relationships to avoid confusion.
-User.belongsToMany(User, {
-	through: Friendship, // Junction table (stores friendships)
-	as: "Friends", // Alias for easier querying
-	foreignKey: "userId", // Column referring to the user who initiated the friendship
-	otherKey: "friendId", // Column referring to the friend being added
-});
+// // --------- MODELS --------- //
+// import User from "./models/user.js";
+// import Message from "./models/message.js";
+// import ChatRoom from "./models/chatRoom.js";
+// import ChatMember from "./models/chatMember.js";
+// import Friendship from "./models/friendship.js";
 
-Message.belongsTo(User); // A message is sent by one specific user.
-User.hasMany(Message); // A user can send many messages.
+// // Always define foreignKey and otherKey explicitly
+// // when doing self-referencing many-to-many relationships to avoid confusion.
+// User.belongsToMany(User, {
+// 	through: Friendship, // Junction table (stores friendships)
+// 	as: "Friends", // Alias for easier querying
+// 	foreignKey: "userId", // Column referring to the user who initiated the friendship
+// 	otherKey: "friendId", // Column referring to the friend being added
+// });
 
-Message.belongsTo(ChatRoom); //  Each message belongs to one specific chatroom.
-ChatRoom.hasMany(Message); // A chatroom can have multiple messages
+// Message.belongsTo(User); // A message is sent by one specific user.
+// User.hasMany(Message); // A user can send many messages.
 
-User.belongsToMany(ChatRoom, { through: ChatMember }); //  A user can join multiple chatrooms.
-ChatRoom.belongsToMany(User, { through: ChatMember }); // A chatroom can have multiple users.
+// Message.belongsTo(ChatRoom); //  Each message belongs to one specific chatroom.
+// ChatRoom.hasMany(Message); // A chatroom can have multiple messages
+
+// User.belongsToMany(ChatRoom, { through: ChatMember }); //  A user can join multiple chatrooms.
+// ChatRoom.belongsToMany(User, { through: ChatMember }); // A chatroom can have multiple users.
 
 // --------- ROUTES --------- //
 import authRoute from "./routes/auth.js";
@@ -63,7 +66,27 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRoute);
-app.use(chatRoute);
+// app.use(chatRoute);
+
+app.get("/test-users", async (req, res) => {
+	const users = await db.User.findAll();
+
+	res.json({
+		message: "success",
+		users: users,
+	});
+});
+
+app.get("/test-user", async (req, res) => {
+	const user = await db.User.findOne({ where: { username: "jake" } });
+	const friends = await user.getFriends();
+
+	res.json({
+		message: "success",
+		user: user,
+		friends: friends,
+	});
+});
 
 // global error handler
 // returns to the client
@@ -80,9 +103,6 @@ app.use((error, req, res, next) => {
 import { runServer } from "./services/server.js";
 import { wsInit } from "./public/ws.js";
 
-// MIGRATION //
-import db from "../models/Index.js";
-
 try {
 	// const _sync = await sequelize.sync({ force: true });
 	// const sync = await sequelize.sync();
@@ -90,7 +110,7 @@ try {
 
 	// RUNS THE NODE AND WEBSOCKET SERVER
 	const nodeServer = await runServer(app, PORT);
-	const wsServer = await wsInit(nodeServer);
+	await wsInit(nodeServer);
 } catch (err) {
 	console.log("DATABASE ERROR", err);
 }

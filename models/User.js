@@ -22,5 +22,21 @@ export default (sequelize, DataTypes) => {
 		},
 	});
 
+	User.associate = (models) => {
+		// A user can have many connections
+		User.belongsToMany(models.User, {
+			through: models.Friendship, // Junction table
+			as: "Friends", // Alias
+			foreignKey: "userId", // Foreign key for User
+			otherKey: "friendId", // Foreign key for Friend
+		});
+
+		// A user can send many message
+		User.hasMany(models.Message);
+
+		// A user can join multiple chatroom
+		User.belongsToMany(models.ChatRoom, { through: models.ChatMember });
+	};
+
 	return User;
 };

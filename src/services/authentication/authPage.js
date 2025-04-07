@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
-import User from "../../models/user.js";
+// import User from "../../models/user.js";
+import db from "../../../models/Index.js";
 import { generateId } from "../../utils/generateId.js";
 import { hashPassword, decryptPassword } from "../../utils/bcryt.js";
 
 export const createUser = async (requestBody) => {
 	const { username, email, password } = requestBody;
 
-	const findUser = await User.findOne({ where: { email: email } });
+	const findUser = await db.User.findOne({ where: { email: email } });
 
 	if (findUser) {
 		const error = new Error("Cannot create use | Already exist");
@@ -22,7 +23,7 @@ export const createUser = async (requestBody) => {
 	// });
 
 	// store user to databse
-	const newUser = await User.create({
+	const newUser = await db.User.create({
 		id: await generateId(),
 		username: username,
 		email: email,
@@ -41,7 +42,7 @@ export const createUser = async (requestBody) => {
 export const loginUser = async (requestBody) => {
 	const { email, password } = requestBody;
 
-	const findUser = await User.findOne({ where: { email: email } });
+	const findUser = await db.User.findOne({ where: { email: email } });
 
 	// if email does not exist
 	if (!findUser) {

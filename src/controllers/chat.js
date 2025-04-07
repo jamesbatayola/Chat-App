@@ -11,6 +11,8 @@ import { where } from "sequelize";
 import User from "../models/user.js";
 import Friendship from "../models/friendship.js";
 
+import db from "../../models/Index.js";
+
 const getHome = async (req, res, next) => {
 	try {
 		const user = req.user;

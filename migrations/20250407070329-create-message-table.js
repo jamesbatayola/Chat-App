@@ -2,25 +2,21 @@
 
 export default {
 	async up(queryInterface, Sequelize) {
-		await queryInterface.createTable("Users", {
+		await queryInterface.createTable("Messages", {
 			id: {
-				type: Sequelize.STRING(4),
+				type: Sequelize.INTEGER,
+				autoIncrement: true,
+				allowNull: false,
 				primaryKey: true,
-				allowNull: false,
 			},
 
-			username: {
+			content: {
 				type: Sequelize.STRING,
 				allowNull: false,
 			},
 
-			email: {
-				type: Sequelize.STRING,
-				allowNull: false,
-			},
-
-			password: {
-				type: Sequelize.STRING,
+			sent_datetime: {
+				type: Sequelize.DATE,
 				allowNull: false,
 			},
 
@@ -37,6 +33,6 @@ export default {
 	},
 
 	async down(queryInterface, Sequelize) {
-		await queryInterface.dropTable("Users");
+		await queryInterface.dropTable("Messages");
 	},
 };

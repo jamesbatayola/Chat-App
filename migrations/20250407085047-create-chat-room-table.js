@@ -1,25 +1,17 @@
-/** @type {import('sequelize-cli').Migration} */
+"use strict";
 
+/** @type {import('sequelize-cli').Migration} */
 export default {
 	async up(queryInterface, Sequelize) {
-		await queryInterface.createTable("Users", {
+		await queryInterface.createTable("ChatRooms", {
 			id: {
-				type: Sequelize.STRING(4),
 				primaryKey: true,
 				allowNull: false,
+				type: Sequelize.INTEGER,
+				autoIncrement: true,
 			},
 
-			username: {
-				type: Sequelize.STRING,
-				allowNull: false,
-			},
-
-			email: {
-				type: Sequelize.STRING,
-				allowNull: false,
-			},
-
-			password: {
+			name: {
 				type: Sequelize.STRING,
 				allowNull: false,
 			},
@@ -37,6 +29,6 @@ export default {
 	},
 
 	async down(queryInterface, Sequelize) {
-		await queryInterface.dropTable("Users");
+		await queryInterface.dropTable("ChatRooms");
 	},
 };

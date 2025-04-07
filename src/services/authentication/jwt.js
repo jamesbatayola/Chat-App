@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import User from "../../models/user.js";
+// import User from "../../models/user.js";
+import db from "../../../models/Index.js";
 import kleur from "kleur";
 import { bgBlue } from "kleur/colors";
 
@@ -38,7 +39,7 @@ export const jwtAuth = async (req, res, next) => {
 		// ------- 3rd STEP ------- //
 
 		// fetches and assign jwt payload to req.user object
-		req.user = await User.findOne({ where: { email: decodedToken.email } });
+		req.user = await db.User.findOne({ where: { email: decodedToken.email } });
 
 		if (!req.user) {
 			console.log(kleur.bgRed("TOKEN MISMTACH"));
