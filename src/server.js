@@ -1,7 +1,7 @@
 // --------- PACKAGES --------- //
 import express, { urlencoded } from "express";
 
-import sequelize from "./config/database.js";
+// import sequelize from "./config/database.js";
 import cors from "cors";
 import kleur from "kleur";
 import cookieParser from "cookie-parser";
@@ -21,7 +21,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // --------- MIGRATED MODELS --------- //
-import db from "../models/Index.js";
+import db from "../Models/Index.js";
 
 // // --------- MODELS --------- //
 // import User from "./models/user.js";
@@ -66,7 +66,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRoute);
-// app.use(chatRoute);
+app.use(chatRoute);
 
 app.get("/test-users", async (req, res) => {
 	const users = await db.User.findAll();
@@ -78,13 +78,34 @@ app.get("/test-users", async (req, res) => {
 });
 
 app.get("/test-user", async (req, res) => {
-	const user = await db.User.findOne({ where: { username: "jake" } });
-	const friends = await user.getFriends();
+	const user = await db.User.findByPk("JJ10");
+	const friends = await user.getFriends({ through: { where: { status: "accepted" } } });
+	const pending = await user.getFriends({ through: { where: { status: "pending" } } });
 
 	res.json({
 		message: "success",
 		user: user,
 		friends: friends,
+		pendings: pending,
+	});
+});
+
+app.get("/test-add-user", async (req, res) => {
+	const user_1 = await db.User.findByPk("JJ10");
+
+	const user_2 = await db.User.findByPk("CI28");
+
+	try {
+		await user_1.addFriend(user_2);
+	} catch (err) {
+		console.log(kleur.bgRed("ERROR OCCURED"));
+		console.log(err);
+		throw err;
+	}
+
+	res.json({
+		status: "success",
+		message: `${user_1.username} added ${user_2.username}`,
 	});
 });
 
@@ -102,6 +123,7 @@ app.use((error, req, res, next) => {
 
 import { runServer } from "./services/server.js";
 import { wsInit } from "./public/ws.js";
+import { stat } from "fs";
 
 try {
 	// const _sync = await sequelize.sync({ force: true });

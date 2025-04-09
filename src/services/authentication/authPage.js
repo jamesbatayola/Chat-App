@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 // import User from "../../models/user.js";
-import db from "../../../models/Index.js";
+import db from "../../../Models/Index.js";
 import { generateId } from "../../utils/generateId.js";
 import { hashPassword, decryptPassword } from "../../utils/bcryt.js";
 
@@ -16,11 +16,6 @@ export const createUser = async (requestBody) => {
 		error.info = `${email} already used, please input another email`;
 		throw error;
 	}
-
-	// sequelize hook: generates id
-	// User.beforeCreate(async (user) => {
-	// 	user.id = await generateId();
-	// });
 
 	// store user to databse
 	const newUser = await db.User.create({

@@ -1,7 +1,10 @@
 import kleur from "kleur";
-import User from "../../models/user.js";
+
+// import User from "../../models/user.js";
+import db from "../../../Models/Index.js";
+
 import { Op } from "sequelize";
-import Friendship from "../../models/friendship.js";
+// import Friendship from "../../models/friendship.js";
 import { getWsServer } from "../../public/ws.js";
 
 export const searchFriend = async (req) => {
@@ -9,7 +12,7 @@ export const searchFriend = async (req) => {
 
 	const isFriend = req.user.getFriends({ where: { username: username } });
 
-	const findUsers = await User.findAll({
+	const findUsers = await db.User.findAll({
 		where: {
 			username: username,
 			id: { [Op.ne]: myID }, // Exclude my own ID
@@ -27,7 +30,9 @@ export const searchFriend = async (req) => {
 
 	const users = await Promise.all(
 		findUsers.map(async (user) => {
-			const to_accept = await Friendship.findOne({ where: { userId: user.id, friendId: myID } });
+			const to_accept = await db.Friendship.findOne({
+				where: { userId: user.id, friendId: myID },
+			});
 
 			const to_cancel = connectedFriends.find((e) => e.id === user.id);
 
@@ -61,9 +66,11 @@ export const addFriend = async (req) => {
 		throw err;
 	}
 
-	const user_to_add = await User.findByPk(userId);
+	const user_to_add = await db.User.findByPk(userId);
 
 	await user.addFriend(user_to_add);
+
+	console.log(kleur.bgGreen("ADDED A USER"));
 
 	const wss = getWsServer();
 

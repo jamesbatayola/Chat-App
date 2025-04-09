@@ -1,6 +1,7 @@
 import kleur from "kleur";
-import User from "../../models/user.js";
-import Friendship from "../../models/friendship.js";
+
+import db from "../../../Models/Index.js";
+
 import { getWsServer } from "../../public/ws.js";
 
 export const showPending = async (req) => {
@@ -13,14 +14,14 @@ export const showPending = async (req) => {
 
 export const showAdded = async (req) => {
 	// junction rows
-	const friendships = await Friendship.findAll({
+	const friendships = await db.Friendship.findAll({
 		where: { friendId: req.user.id, status: "pending" },
 	});
 
 	// users
 	const addedYou = await Promise.all(
 		friendships.map(async (e) => {
-			return await User.findByPk(e.userId);
+			return await db.User.findByPk(e.userId);
 		}),
 	);
 
@@ -32,7 +33,7 @@ export const acceptFriendRequest = async (req) => {
 
 	console.log(kleur.bgYellow("START"));
 
-	const friend_to_accept = await User.findByPk(userid);
+	const friend_to_accept = await db.User.findByPk(userid);
 
 	if (!friend_to_accept) {
 		const err = new Error("user does not exist in the database");
@@ -43,7 +44,7 @@ export const acceptFriendRequest = async (req) => {
 	// activate friendship
 	await req.user.addFriend(friend_to_accept, { through: { status: "accepted" } });
 
-	const friend = await Friendship.findOne({
+	const friend = await db.Friendship.findOne({
 		where: {
 			userId: friend_to_accept.id,
 			friendId: req.user.id,
@@ -87,7 +88,7 @@ export const cancelFriendRequest = async (req) => {
 	console.log(kleur.bgBlue("HHHHHHHHHHHH"));
 	console.log(pending_user_id);
 
-	const connection = await Friendship.findOne({
+	const connection = await db.Friendship.findOne({
 		where: { userId: req.user.id, friendId: pending_user_id },
 	});
 

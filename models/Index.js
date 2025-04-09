@@ -18,8 +18,6 @@ const config = configFile[env];
 // Container for models
 const db = {};
 
-console.log(config);
-
 // Initialize Sequelize instance using config
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
 

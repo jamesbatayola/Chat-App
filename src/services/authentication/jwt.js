@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-// import User from "../../models/user.js";
-import db from "../../../models/Index.js";
-import kleur from "kleur";
-import { bgBlue } from "kleur/colors";
 
-// 1) Get the token from COOKIE
+import db from "../../../Models/Index.js";
+import kleur from "kleur";
+
+// 1) Get the token from QUERY
 // 2) Decode the token
 // 3) Assign its payload to request object
 
@@ -12,17 +11,16 @@ export const jwtAuth = async (req, res, next) => {
 	try {
 		// ------- 1st STEP ------- //
 
-		const token = req.cookies.token;
-
-		if (!token) {
-			console.log(kleur.bgRed("NO JWT TOKEN PROVIDED"));
-			const error = new Error("No JWT token provided");
-			error.status = "failed";
-			error.statusCode = 401;
-			throw error;
+		if (!req.query["jwt"]) {
+			const err = new Error("NO JWT PROVIDED");
+			err.statusCode = 401;
+			err.status = "failed";
+			throw err;
 		}
 
-		// ------- 2nd STEP ------- //
+		const token = req.query.jwt;
+
+		// // ------- 2nd STEP ------- //
 
 		// temp decoded token variable
 		let decodedToken;
@@ -36,7 +34,7 @@ export const jwtAuth = async (req, res, next) => {
 			throw error;
 		}
 
-		// ------- 3rd STEP ------- //
+		// // ------- 3rd STEP ------- //
 
 		// fetches and assign jwt payload to req.user object
 		req.user = await db.User.findOne({ where: { email: decodedToken.email } });

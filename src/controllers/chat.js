@@ -1,17 +1,18 @@
 import kleur from "kleur";
+
 import { searchFriend, addFriend } from "../services/home/searchFriend.js";
+
 import {
 	showPending,
 	showAdded,
 	cancelFriendRequest,
 	acceptFriendRequest,
 } from "../services/home/friendRequest.js";
-import { getWsServer } from "../public/ws.js";
-import { where } from "sequelize";
-import User from "../models/user.js";
-import Friendship from "../models/friendship.js";
 
-import db from "../../models/Index.js";
+// import User from "../models/user.js";
+// import Friendship from "../models/friendship.js";
+
+import db from "../../Models/Index.js";
 
 const getHome = async (req, res, next) => {
 	try {
@@ -27,7 +28,7 @@ const getHome = async (req, res, next) => {
 			through: { where: { status: "accepted" } }, // accessing junction table fields
 		});
 
-		res.render("home/home", {
+		res.render("home/home.ejs", {
 			friends: userFriends,
 		});
 	} catch (err) {

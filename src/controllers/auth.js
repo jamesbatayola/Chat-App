@@ -12,32 +12,39 @@ const postLogin = async (req, res, next) => {
 		// Authenticate user & generate JWT
 		const payload = await loginUser(req.body);
 
-		// Storing JWT token via HttpOnly cookie
-		res.cookie("token", payload.token, {
-			httpOnly: true, // XSS protection
-			sameSite: "Strict", // SRF protection
-			maxAge: 3600000, // 1 hour expiration
-		});
-
-		res.cookie("user_id", payload.user.id, {
-			sameSite: "Strict",
-			secure: false,
-			maxAge: 3600000, // 1 hour expiration
-		});
-
-		// const wsServer = getWsServer();
-
-		// wsServer.on("connection", (ws, req) => {});
-
 		res.status(200).json({
 			status: "success",
 			message: "Redirecting to home page",
-			link: "home",
+
+			// PRIMARY
+			token: payload.token,
+			user_id: payload.user.id,
 		});
 	} catch (err) {
 		next(err);
 	}
 };
+
+// Storing JWT token via HttpOnly cookie
+// res.cookie("token", payload.token, {
+// 	httpOnly: true, // XSS protection
+// 	sameSite: "Strict", // SRF protection
+// 	maxAge: 3600000, // 1 hour expiration
+// });
+
+// Storing JWT token via HttpOnly cookie
+
+// res.cookie("user_id", payload.user.id, {
+// 	sameSite: "Strict",
+// 	secure: false,
+// 	maxAge: 3600000, // 1 hour expiration
+// });
+
+// sessionStorage.setItem("user_id", payload.user.id);
+
+// const wsServer = getWsServer();
+
+// wsServer.on("connection", (ws, req) => {});
 
 const getSignup = async (req, res, next) => {
 	res.render("auth/signup");

@@ -35,6 +35,9 @@
 	const friendRequest = document.querySelector(".friend-request");
 	const searchFriend = document.querySelector(".search-friend");
 
+	// get jwt token
+	const token = sessionStorage.getItem("token");
+
 	friends.forEach((friend) => {
 		friend.addEventListener("click", async (ev) => {
 			console.log("HELLO WORLD");
@@ -42,11 +45,11 @@
 	});
 
 	friendRequest.addEventListener("click", (ev) => {
-		window.location.href = `http://localhost:7000/friendRequest`;
+		window.location.href = `http://localhost:7000/friendRequest?jwt=${token}`;
 	});
 
 	searchFriend.addEventListener("click", async (ev) => {
-		window.location.href = "http://localhost:7000/searchfriend";
+		window.location.href = `http://localhost:7000/searchfriend?jwt=${token}`;
 	});
 
 	// ------- WEB SOCKET ------- //

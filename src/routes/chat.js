@@ -1,6 +1,6 @@
 import express from "express";
 import { jwtAuth } from "../services/authentication/jwt.js";
-import chatController from "../controllers/chat.js";
+import chatController from "../Controllers/chat.js";
 
 const router = express.Router();
 

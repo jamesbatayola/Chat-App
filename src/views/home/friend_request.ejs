@@ -64,6 +64,8 @@
 	const addyou_container = document.querySelector(".add-you-container");
 	const my_id = document.querySelector(".my-id");
 
+	const token = sessionStorage.getItem("token");
+
 	const cancel_buttons = document.querySelectorAll(".cancel-button");
 	cancel_buttons.forEach((btn) => {
 		btn.addEventListener("click", async (ev) => {
@@ -71,15 +73,18 @@
 
 			const pending_user_id = ev.target.parentElement.children[1].textContent.substring(1);
 
-			const cancel_request_result = await fetch("http://localhost:7000/addfriend-cancel", {
-				method: "POST",
-				headers: {
-					"content-type": "application/json",
+			const cancel_request_result = await fetch(
+				`http://localhost:7000/addfriend-cancel?jwt=${token}`,
+				{
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+					},
+					body: JSON.stringify({
+						pending_user_id: pending_user_id,
+					}),
 				},
-				body: JSON.stringify({
-					pending_user_id: pending_user_id,
-				}),
-			});
+			);
 
 			const data = await cancel_request_result.json();
 
@@ -101,16 +106,19 @@
 		button.addEventListener("click", async (ev) => {
 			ev.preventDefault();
 
-			const accept_request_result = await fetch(`http://localhost:7000/friendRequest/accept`, {
-				method: "POST",
-				headers: {
-					"content-type": "application/json",
+			const accept_request_result = await fetch(
+				`http://localhost:7000/friendRequest/accept?jwt=${token}`,
+				{
+					method: "POST",
+					headers: {
+						"content-type": "application/json",
+					},
+					body: JSON.stringify({
+						userid: payload.userid,
+						username: payload.username,
+					}),
 				},
-				body: JSON.stringify({
-					userid: payload.userid,
-					username: payload.username,
-				}),
-			});
+			);
 
 			const data = await accept_request_result.json();
 

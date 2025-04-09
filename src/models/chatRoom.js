@@ -1,19 +1,19 @@
-import { DataTypes } from "sequelize";
+// import { DataTypes } from "sequelize";
 
-import sequelize from "../config/database.js";
+// import sequelize from "../config/database.js";
 
-const ChatRoom = sequelize.define("chatRoom", {
-	id: {
-		primaryKey: true,
-		allowNull: false,
-		type: DataTypes.INTEGER,
-		autoIncrement: true,
-	},
+// const ChatRoom = sequelize.define("chatRoom", {
+// 	id: {
+// 		primaryKey: true,
+// 		allowNull: false,
+// 		type: DataTypes.INTEGER,
+// 		autoIncrement: true,
+// 	},
 
-	name: {
-		type: DataTypes.STRING,
-		allowNull: false,
-	},
-});
+// 	name: {
+// 		type: DataTypes.STRING,
+// 		allowNull: false,
+// 	},
+// });
 
-export default ChatRoom;
+// export default ChatRoom;

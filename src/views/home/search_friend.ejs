@@ -36,12 +36,14 @@
 
 	const userlist_container = document.querySelector(".userlist-container");
 
+	const token = sessionStorage.getItem("token");
+
 	document.querySelector(".form-class").addEventListener("submit", async (ev) => {
 		ev.preventDefault();
 
 		userlist_container.style.visibility = "visible";
 
-		const res = await fetch("http://localhost:7000/searchFriend", {
+		const res = await fetch(`http://localhost:7000/searchFriend?jwt=${token}`, {
 			method: "post",
 			headers: {
 				"content-type": "application/json",
@@ -88,31 +90,37 @@
 				if (btn.textContent.trim() === "Add") {
 					// ------- ADD FRIEND ------- //
 
-					const addfriend_result = await fetch("http://localhost:7000/addfriend", {
-						method: "POST",
-						headers: {
-							"content-type": "application/json",
+					const addfriend_result = await fetch(
+						`http://localhost:7000/addfriend?jwt=${token}`,
+						{
+							method: "POST",
+							headers: {
+								"content-type": "application/json",
+							},
+							body: JSON.stringify({
+								userName: user_name,
+								userId: user_id,
+							}),
 						},
-						body: JSON.stringify({
-							userName: user_name,
-							userId: user_id,
-						}),
-					});
+					);
 
 					btn.classList.add("Cancel");
 					btn.textContent = "Cancel";
 				} else if (btn.textContent.trim() === "Cancel") {
 					// ------- CANCEl FRIEND ------- //
 
-					const cancel_request_result = await fetch("http://localhost:7000/addfriend-cancel", {
-						method: "POST",
-						headers: {
-							"content-type": "application/json",
+					const cancel_request_result = await fetch(
+						`http://localhost:7000/addfriend-cancel?jwt=${token}`,
+						{
+							method: "POST",
+							headers: {
+								"content-type": "application/json",
+							},
+							body: JSON.stringify({
+								pending_user_id: user_id,
+							}),
 						},
-						body: JSON.stringify({
-							pending_user_id: user_id,
-						}),
-					});
+					);
 
 					const data = await cancel_request_result.json();
 					console.log(data);
