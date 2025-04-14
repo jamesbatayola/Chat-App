@@ -1,5 +1,3 @@
-import kleur from "kleur";
-
 // index.js (ES module version)
 import fs from "fs";
 import path from "path";
@@ -19,30 +17,37 @@ const config = configFile[env];
 const db = {};
 
 // Initialize Sequelize instance using config
-const sequelize = new Sequelize(config.database, config.username, config.password, config);
+const sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config
+);
 
 // Dynamically import and initialize all model files
 const files = fs.readdirSync(__dirname);
 
 for (const file of files) {
-	if (
-		file.indexOf(".") !== 0 &&
-		file !== basename &&
-		file.endsWith(".js") &&
-		!file.endsWith(".test.js")
-	) {
-		// Dynamic import for each model file
-		const modelModule = await import(pathToFileURL(path.join(__dirname, file)).href);
-		const model = modelModule.default(sequelize, Sequelize.DataTypes);
-		db[model.name] = model;
-	}
+  if (
+    file.indexOf(".") !== 0 &&
+    file !== basename &&
+    file.endsWith(".js") &&
+    !file.endsWith(".test.js")
+  ) {
+    // Dynamic import for each model file
+    const modelModule = await import(
+      pathToFileURL(path.join(__dirname, file)).href
+    );
+    const model = modelModule.default(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
+  }
 }
 
 // Setup model associations
 for (const modelName of Object.keys(db)) {
-	if (typeof db[modelName].associate === "function") {
-		db[modelName].associate(db);
-	}
+  if (typeof db[modelName].associate === "function") {
+    db[modelName].associate(db);
+  }
 }
 
 // Export Sequelize instance and models

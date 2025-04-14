@@ -2,7 +2,7 @@ import express from "express";
 
 const router = express.Router();
 
-import authController from "../controllers/auth.js";
+import authController from "../Controllers/auth.js"
 
 // validator
 import { validate } from "../services/validator/zod.js";

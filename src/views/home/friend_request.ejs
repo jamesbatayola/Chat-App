@@ -1,180 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-	</head>
-	<body>
-		<div class="container">
-			<div class="content">
-				<h1>Friend Request</h1>
-				<input class="my-id" type="text" hidden value="<%= my_id %>" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <h1>Friend Request</h1>
+        <input class="my-id" type="text" hidden value="<%= my_id %>" />
 
-				<hr />
+        <hr />
 
-				<h3>Added you</h3>
+        <h3>Added you</h3>
 
-				<div class="pending-container add-you-container">
-					<% if(addedYou.length <= 0) { %>
+        <div class="pending-container add-you-container">
+          <% if(addedYou.length <= 0) { %>
 
-					<div class="user-request-container null-placeholder">
-						<p>No one added you</p>
-					</div>
+          <div class="user-request-container null-placeholder">
+            <p>No one added you</p>
+          </div>
 
-					<% } else { %> <% addedYou.forEach(each => { %>
+          <% } else { %> <% addedYou.forEach(each => { %>
 
-					<div class="user-request-container add-you <%= each.id %>">
-						<div class="credential request-username"><%= each.username %></div>
-						<div class="credential request-userid">#<%= each.id %></div>
-						<button class="button accept-button">Accept</button>
-					</div>
+          <div class="user-request-container add-you <%= each.id %>">
+            <div class="credential request-username"><%= each.username %></div>
+            <div class="credential request-userid">#<%= each.id %></div>
+            <button class="button accept-button">Accept</button>
+          </div>
 
-					<% }) %> <% } %>
-				</div>
+          <% }) %> <% } %>
+        </div>
 
-				<hr />
+        <hr />
 
-				<h3>Pending</h3>
+        <h3>Pending</h3>
 
-				<div class="pending-container you-add-container">
-					<% if(pendingAdded.length <= 0) { %>
+        <div class="pending-container you-add-container">
+          <% if(pendingAdded.length <= 0) { %>
 
-					<div class="user-request-container null-placeholder">
-						<p>You added no one</p>
-					</div>
+          <div class="user-request-container null-placeholder">
+            <p>You added no one</p>
+          </div>
 
-					<% } else { %> <% pendingAdded.forEach(each => { %>
+          <% } else { %> <% pendingAdded.forEach(each => { %>
 
-					<div class="user-request-container you-add">
-						<div class="credential request-username"><%= each.username %></div>
-						<div class="credential request-userid">#<%= each.id %></div>
-						<button class="button cancel-button">Cancel</button>
-					</div>
+          <div class="user-request-container you-add">
+            <div class="credential request-username"><%= each.username %></div>
+            <div class="credential request-userid">#<%= each.id %></div>
+            <button class="button cancel-button">Cancel</button>
+          </div>
 
-					<% }) %> <% } %>
-				</div>
-			</div>
-		</div>
-	</body>
+          <% }) %> <% } %>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
 
 <script type="module">
-	const youadd_container = document.querySelector(".you-add-container");
-	const addyou_container = document.querySelector(".add-you-container");
-	const my_id = document.querySelector(".my-id");
+  const youadd_container = document.querySelector(".you-add-container");
+  const addyou_container = document.querySelector(".add-you-container");
+  const my_id = document.querySelector(".my-id");
 
-	const token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("token");
 
-	const cancel_buttons = document.querySelectorAll(".cancel-button");
-	cancel_buttons.forEach((btn) => {
-		btn.addEventListener("click", async (ev) => {
-			ev.preventDefault();
+  const cancel_buttons = document.querySelectorAll(".cancel-button");
 
-			const pending_user_id = ev.target.parentElement.children[1].textContent.substring(1);
+  cancel_buttons.forEach((btn) => {
+    btn.addEventListener("click", async (ev) => {
+      ev.preventDefault();
 
-			const cancel_request_result = await fetch(
-				`http://localhost:7000/addfriend-cancel?jwt=${token}`,
-				{
-					method: "POST",
-					headers: {
-						"content-type": "application/json",
-					},
-					body: JSON.stringify({
-						pending_user_id: pending_user_id,
-					}),
-				},
-			);
+      const pending_user_id =
+        ev.target.parentElement.children[1].textContent.substring(1);
 
-			const data = await cancel_request_result.json();
+      const cancel_request_result = await fetch(
+        `http://localhost:7000/addfriend-cancel?jwt=${token}`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            pending_user_id: pending_user_id,
+          }),
+        }
+      );
 
-			if (data.status === "success") {
-				if (youadd_container.children.length === 1) {
-					youadd_container.innerHTML = `
+      const data = await cancel_request_result.json();
+
+      if (data.status === "success") {
+        if (youadd_container.children.length === 1) {
+          youadd_container.innerHTML = `
 							<div class="user-request-container">
 								<p>You added no one</p>
 							</div>
 						`;
-				} else {
-					ev.target.parentElement.remove();
-				}
-			}
-		});
-	});
+        } else {
+          ev.target.parentElement.remove();
+        }
+      }
+    });
+  });
 
-	const Accept_Button = async (button, payload) => {
-		button.addEventListener("click", async (ev) => {
-			ev.preventDefault();
+  const Accept_Button = async (button, payload) => {
+    button.addEventListener("click", async (ev) => {
+      ev.preventDefault();
 
-			const accept_request_result = await fetch(
-				`http://localhost:7000/friendRequest/accept?jwt=${token}`,
-				{
-					method: "POST",
-					headers: {
-						"content-type": "application/json",
-					},
-					body: JSON.stringify({
-						userid: payload.userid,
-						username: payload.username,
-					}),
-				},
-			);
+      const accept_request_result = await fetch(
+        `http://localhost:7000/friendRequest/accept?jwt=${token}`,
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            userid: payload.userid,
+            username: payload.username,
+          }),
+        }
+      );
 
-			const data = await accept_request_result.json();
+      const data = await accept_request_result.json();
 
-			if (data.status === "success") {
-				if (addyou_container.children.length === 1) {
-					addyou_container.innerHTML = `
+      if (data.status === "success") {
+        if (addyou_container.children.length === 1) {
+          addyou_container.innerHTML = `
 						<div class="user-request-container null-placeholder">
 							<p>No one added you</p>
 						</div>
 					`;
 
-					return;
-				}
+          return;
+        }
 
-				addyou_container.querySelector(`[class~="${payload.userid}"]`).remove();
-			}
-		});
-	};
+        addyou_container.querySelector(`[class~="${payload.userid}"]`).remove();
+      }
+    });
+  };
 
-	document.querySelectorAll(".accept-button").forEach((button) => {
-		const userid = button.parentElement.children[1].textContent.substring(1);
-		const username = button.parentElement.children[0].textContent;
+  document.querySelectorAll(".accept-button").forEach((button) => {
+    const userid = button.parentElement.children[1].textContent.substring(1);
+    const username = button.parentElement.children[0].textContent;
 
-		const payload = {
-			userid: userid,
-			username: username,
-		};
+    const payload = {
+      userid: userid,
+      username: username,
+    };
 
-		Accept_Button(button, payload);
-	});
+    Accept_Button(button, payload);
+  });
 
-	// ----- WEB SOCKET ----- //
-	const ws = new WebSocket(`ws://localhost:7000`);
+  // ----- WEB SOCKET ----- //
+  const ws = new WebSocket(`ws://localhost:7000`);
 
-	ws.onmessage = async (ev) => {
-		const json_data = JSON.parse(ev.data);
+  ws.onmessage = async (ev) => {
+    const json_data = JSON.parse(ev.data);
 
-		const from = json_data.from;
-		const recipient = json_data.recipient;
+    const from = json_data.from;
+    const recipient = json_data.recipient;
 
-		const payload = {
-			userid: json_data.from.id,
-			username: json_data.from.username,
-		};
+    const payload = {
+      userid: json_data.from.id,
+      username: json_data.from.username,
+    };
 
-		if (recipient.id === my_id.value) {
-			//
-			if (json_data.type === "addfriend") {
-				//
-				if (addyou_container.firstElementChild.classList.contains("null-placeholder")) {
-					addyou_container.firstElementChild.remove();
-				}
+    if (recipient.id === my_id.value) {
+      //
+      if (json_data.type === "addfriend") {
+        //
+        if (
+          addyou_container.firstElementChild.classList.contains(
+            "null-placeholder"
+          )
+        ) {
+          addyou_container.firstElementChild.remove();
+        }
 
-				const div = document.createElement("div");
+        const div = document.createElement("div");
 
-				div.innerHTML = `
+        div.innerHTML = `
 						<div class="user-request-container add-you ${payload.userid}">
 							<div class="credential request-username">${payload.username}</div>
 							<div class="credential request-userid">#${payload.userid}</div>
@@ -182,95 +188,95 @@
 						</div>
 					`;
 
-				const button = div.querySelector(["accept-button"]);
+        const button = div.querySelector(["accept-button"]);
 
-				await Accept_Button(button, payload);
+        await Accept_Button(button, payload);
 
-				addyou_container.append(div);
+        addyou_container.append(div);
 
-				return;
-			}
+        return;
+      }
 
-			if (json_data.type === "cancel_request") {
-				//
-				if (addyou_container.children.length === 1) {
-					addyou_container.innerHTML = `
+      if (json_data.type === "cancel_request") {
+        //
+        if (addyou_container.children.length === 1) {
+          addyou_container.innerHTML = `
 						<div class="user-request-container null-placeholder">
 							<p>No one added you</p>
 						</div>
 					`;
 
-					return;
-				}
+          return;
+        }
 
-				addyou_container.querySelector(`[class~="${from.id}"]`).remove();
+        addyou_container.querySelector(`[class~="${from.id}"]`).remove();
 
-				return;
-			}
-		}
-	};
+        return;
+      }
+    }
+  };
 </script>
 
 <style>
-	*,
-	body {
-		padding: 0;
-		margin: 0;
-		box-sizing: border-box;
-	}
+  *,
+  body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
 
-	.container {
-		border: 1px solid black;
-		display: grid;
-		place-items: center;
-		height: 100vh;
-	}
+  .container {
+    border: 1px solid black;
+    display: grid;
+    place-items: center;
+    height: 100vh;
+  }
 
-	.content {
-		border: 1px solid black;
-		width: 450px;
-		padding: 0.7rem;
-		border-radius: 0.5rem;
-	}
+  .content {
+    border: 1px solid black;
+    width: 450px;
+    padding: 0.7rem;
+    border-radius: 0.5rem;
+  }
 
-	h1 {
-		padding-bottom: 0.4rem;
-	}
+  h1 {
+    padding-bottom: 0.4rem;
+  }
 
-	.credential {
-		display: grid;
-		place-items: center;
-	}
+  .credential {
+    display: grid;
+    place-items: center;
+  }
 
-	button {
-		padding: 5px;
-	}
+  button {
+    padding: 5px;
+  }
 
-	button {
-		margin-left: auto;
-	}
+  button {
+    margin-left: auto;
+  }
 
-	.pending-container {
-		min-height: 50px;
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
+  .pending-container {
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-	.pending-container:first-of-type {
-		/* border-bottom: 1px solid gray; */
-		padding-bottom: 12px;
-	}
+  .pending-container:first-of-type {
+    /* border-bottom: 1px solid gray; */
+    padding-bottom: 12px;
+  }
 
-	.user-request-container {
-		border: 1px solid gray;
-		border-radius: 5px;
-		padding: 7px 5px;
-		display: flex;
-		gap: 0.5rem;
-	}
+  .user-request-container {
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 7px 5px;
+    display: flex;
+    gap: 0.5rem;
+  }
 
-	.request-userid {
-		color: rgb(174, 174, 174);
-	}
+  .request-userid {
+    color: rgb(174, 174, 174);
+  }
 </style>

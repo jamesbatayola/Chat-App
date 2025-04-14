@@ -54,9 +54,9 @@ import chatRoute from "./routes/chat.js";
 
 // --------- MIDDLEWARES --------- //
 app.use(
-	cors({
-		credentials: true, // crucial: allows cookies to be accepted
-	}),
+  cors({
+    credentials: true, // crucial: allows cookies to be accepted
+  })
 );
 
 app.use(express.static(path.join(__dirname, "public"))); // serves static files
@@ -69,70 +69,73 @@ app.use("/auth", authRoute);
 app.use(chatRoute);
 
 app.get("/test-users", async (req, res) => {
-	const users = await db.User.findAll();
+  const users = await db.User.findAll();
 
-	res.json({
-		message: "success",
-		users: users,
-	});
+  res.json({
+    message: "success",
+    users: users,
+  });
 });
 
 app.get("/test-user", async (req, res) => {
-	const user = await db.User.findByPk("JJ10");
-	const friends = await user.getFriends({ through: { where: { status: "accepted" } } });
-	const pending = await user.getFriends({ through: { where: { status: "pending" } } });
+  const user = await db.User.findByPk("JJ10");
+  const friends = await user.getFriends({
+    through: { where: { status: "accepted" } },
+  });
+  const pending = await user.getFriends({
+    through: { where: { status: "pending" } },
+  });
 
-	res.json({
-		message: "success",
-		user: user,
-		friends: friends,
-		pendings: pending,
-	});
+  res.json({
+    message: "success",
+    user: user,
+    friends: friends,
+    pendings: pending,
+  });
 });
 
 app.get("/test-add-user", async (req, res) => {
-	const user_1 = await db.User.findByPk("JJ10");
+  const user_1 = await db.User.findByPk("JJ10");
 
-	const user_2 = await db.User.findByPk("CI28");
+  const user_2 = await db.User.findByPk("CI28");
 
-	try {
-		await user_1.addFriend(user_2);
-	} catch (err) {
-		console.log(kleur.bgRed("ERROR OCCURED"));
-		console.log(err);
-		throw err;
-	}
+  try {
+    await user_1.addFriend(user_2);
+  } catch (err) {
+    console.log(kleur.bgRed("ERROR OCCURED"));
+    console.log(err);
+    throw err;
+  }
 
-	res.json({
-		status: "success",
-		message: `${user_1.username} added ${user_2.username}`,
-	});
+  res.json({
+    status: "success",
+    message: `${user_1.username} added ${user_2.username}`,
+  });
 });
 
 // global error handler
 // returns to the client
 app.use((error, req, res, next) => {
-	res.status(error.statusCode).json({
-		info: error.info,
-		message: error.message || "INTERNAL ERROR",
-		status: error.status,
-	});
+  res.status(error.statusCode).json({
+    info: error.info,
+    message: error.message || "INTERNAL ERROR",
+    status: error.status,
+  });
 });
 
 // --------- STARTS SERVER --------- //
 
 import { runServer } from "./services/server.js";
 import { wsInit } from "./public/ws.js";
-import { stat } from "fs";
 
 try {
-	// const _sync = await sequelize.sync({ force: true });
-	// const sync = await sequelize.sync();
-	await db.sequelize.authenticate();
+  // const _sync = await sequelize.sync({ force: true });
+  // const sync = await sequelize.sync();
+  await db.sequelize.authenticate();
 
-	// RUNS THE NODE AND WEBSOCKET SERVER
-	const nodeServer = await runServer(app, PORT);
-	await wsInit(nodeServer);
+  // RUNS THE NODE AND WEBSOCKET SERVER
+  const nodeServer = await runServer(app, PORT);
+  await wsInit(nodeServer);
 } catch (err) {
-	console.log("DATABASE ERROR", err);
+  console.log("DATABASE ERROR", err);
 }
