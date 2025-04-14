@@ -57,6 +57,10 @@ export const acceptFriendRequest = async (req) => {
     await friend.save();
   }
 
+  // CREATE CHAT ROOM
+
+  // const chat_room = await db.ChatRoom.create({});
+
   // ----- notify (websocket) ----- //
 
   const ws = getWsServer();
@@ -74,6 +78,7 @@ export const acceptFriendRequest = async (req) => {
             id: userid,
             username: username,
           },
+          chat_room_id: chat_room.id,
         })
       );
     }
