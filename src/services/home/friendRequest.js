@@ -58,18 +58,7 @@ export const acceptFriendRequest = async (req) => {
   }
 
   // CREATE CHAT ROOM
-  // const chat_member_1 = await db.ChatMember.create({
-  //   userId: req.user.id,
-  //   chatRoomId: chat_room.id,
-  // });
-
-  // const chat_member_2 = await db.ChatMember.create({
-  //   userId: friend_to_accept.id,
-  //   chatRoomId: chat_room.id,
-  // });
-
   const chat_room = await db.ChatRoom.create();
-
   await chat_room.addUsers([req.user, friend_to_accept]);
 
   // ----- notify (websocket) ----- //
