@@ -2,51 +2,52 @@
 
 /** @type {import('sequelize-cli').Migration} */
 export default {
-	async up(queryInterface, Sequelize) {
-		await queryInterface.createTable("ChatMembers", {
-			id: {
-				primaryKey: true,
-				allowNull: false,
-				autoIncrement: true,
-				type: Sequelize.INTEGER,
-			},
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("ChatMembers", {
+      id: {
+        primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
+        type: Sequelize.INTEGER,
+      },
 
-			joined_at: {
-				type: Sequelize.DATE,
-				allowNull: false,
-			},
+      joined_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: new Date(),
+      },
 
-			createdAt: {
-				allowNull: false,
-				type: Sequelize.DATE,
-			},
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
 
-			updatedAt: {
-				allowNull: false,
-				type: Sequelize.DATE,
-			},
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
 
-			// ----- ASSOCIATIONS ----- //
+      // ----- ASSOCIATIONS ----- //
 
-			// userId: {
-			// 	type: Sequelize.STRING(4),
-			// 	references: {
-			// 		model: "Users",
-			// 		key: "id",
-			// 	},
-			// 	onDelete: "CASCADE",
-			// },
+      // userId: {
+      // 	type: Sequelize.STRING(4),
+      // 	references: {
+      // 		model: "Users",
+      // 		key: "id",
+      // 	},
+      // 	onDelete: "CASCADE",
+      // },
 
-			// chatRoomId: {
-			// 	type: DataTypes.INTEGER,
-			// 	references: {
-			// 		model: "ChatRooms",
-			// 		key: "id",
-			// 	},
-			// 	onDelete: "CASCADE",
-			// },
-		});
-	},
+      // chatRoomId: {
+      // 	type: DataTypes.INTEGER,
+      // 	references: {
+      // 		model: "ChatRooms",
+      // 		key: "id",
+      // 	},
+      // 	onDelete: "CASCADE",
+      // },
+    });
+  },
 
-	async down(queryInterface, Sequelize) {},
+  async down(queryInterface, Sequelize) {},
 };
