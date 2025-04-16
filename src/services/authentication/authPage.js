@@ -38,14 +38,6 @@ export const createUser = async (requestBody) => {
 export const loginUser = async (req) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    const error = new Error("Invalid input");
-    error.statusCode = 400;
-    error.status = "failed";
-    error.info = "Invalid input";
-    throw error;
-  }
-
   let findUser;
 
   try {
@@ -73,8 +65,6 @@ export const loginUser = async (req) => {
     throw error;
   }
 
-  console.log(kleur.bgYellow("FROM SERVICE"));
-
   // Generate jwt token
   const token = jwt.sign({ email: findUser.email }, process.env.JWT_TOKEN);
 
@@ -82,7 +72,7 @@ export const loginUser = async (req) => {
     token: token,
     user: {
       id: findUser.id,
-      email: findUser.email,
+      name: findUser.username,
     },
   };
 };

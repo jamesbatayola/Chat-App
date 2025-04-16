@@ -1,71 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-	</head>
-	<body>
-		<div class="container">
-			<div class="content">
-				<form class="form-class" action="">
-					<h1>Find a friend</h1>
-					<div>
-						<label for="username">Username</label>
-						<input class="username-input" type="text" name="username" />
-					</div>
-					<button class="search-button">Search</button>
-					<hr />
-					<p>Your id: <span class="myID"><%= user.id %></span></p>
-				</form>
-				<div class="userlist-container" style="visibility: hidden">
-					<!-- <h2>Users</h2> -->
-					<!-- <div class="user">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <form class="form-class" action="">
+          <h1>Find a friend</h1>
+          <div>
+            <label for="username">Username</label>
+            <input class="username-input" type="text" name="username" />
+          </div>
+          <button class="search-button">Search</button>
+          <hr />
+          <p>Your id: <span class="myID"><%= user.id %></span></p>
+        </form>
+        <div class="userlist-container" style="visibility: hidden">
+          <!-- <h2>Users</h2> -->
+          <!-- <div class="user">
 						<div class="name">rain</div>
 						<div class="add-button">+</div>
 					</div> -->
-				</div>
-			</div>
-		</div>
-	</body>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
 
 <script type="module">
-	const username_input = document.querySelector(".username-input");
-	const myID = document.querySelector(".myID").textContent;
+  const username_input = document.querySelector(".username-input");
+  const myID = document.querySelector(".myID").textContent;
 
-	const userlist_container = document.querySelector(".userlist-container");
+  const userlist_container = document.querySelector(".userlist-container");
 
-	const token = sessionStorage.getItem("token");
+  document
+    .querySelector(".form-class")
+    .addEventListener("submit", async (ev) => {
+      ev.preventDefault();
 
-	document.querySelector(".form-class").addEventListener("submit", async (ev) => {
-		ev.preventDefault();
+      userlist_container.style.visibility = "visible";
 
-		userlist_container.style.visibility = "visible";
+      const res = await fetch(`http://localhost:7000/searchFriend`, {
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username_input.value,
+          myID: myID,
+        }),
+      });
 
-		const res = await fetch(`http://localhost:7000/searchFriend?jwt=${token}`, {
-			method: "post",
-			headers: {
-				"content-type": "application/json",
-			},
-			body: JSON.stringify({
-				username: username_input.value,
-				myID: myID,
-			}),
-		});
+      const data = await res.json();
 
-		const data = await res.json();
+      // ------------- USER LIST CONTAINER ------------- //
 
-		// ------------- USER LIST CONTAINER ------------- //
+      if (data.message === "No user found") {
+        userlist_container.innerHTML = `<h2>${data.message}</h2>`;
+      } else {
+        userlist_container.innerHTML = "<h2>Users</h2>";
+        data.users.forEach((user) => {
+          const div = document.createElement("div");
 
-		if (data.message === "No user found") {
-			userlist_container.innerHTML = `<h2>${data.message}</h2>`;
-		} else {
-			userlist_container.innerHTML = "<h2>Users</h2>";
-			data.users.forEach((user) => {
-				const div = document.createElement("div");
-
-				div.innerHTML = `
+          div.innerHTML = `
 						<div class="user">
 							<div class="user_name">${user.username}</div>
 							<div class="user_id">#${user.id}</div>
@@ -74,145 +74,148 @@
 						</div>
 					`;
 
-				userlist_container.append(div);
-			});
-		}
+          userlist_container.append(div);
+        });
+      }
 
-		const interact_buttons = document.querySelectorAll("#interact-button");
+      const interact_buttons = document.querySelectorAll("#interact-button");
 
-		interact_buttons.forEach((btn) => {
-			const user_name = ev.target.parentElement.querySelector(".user_name").textContent;
-			const user_id = ev.target.parentElement.querySelector(".user_id").textContent.substring(1);
+      interact_buttons.forEach((btn) => {
+        const user_name =
+          ev.target.parentElement.querySelector(".user_name").textContent;
+        const user_id = ev.target.parentElement
+          .querySelector(".user_id")
+          .textContent.substring(1);
 
-			btn.addEventListener("click", async (ev) => {
-				ev.preventDefault();
+        btn.addEventListener("click", async (ev) => {
+          ev.preventDefault();
 
-				if (btn.textContent.trim() === "Add") {
-					// ------- ADD FRIEND ------- //
+          if (btn.textContent.trim() === "Add") {
+            // ------- ADD FRIEND ------- //
 
-					const addfriend_result = await fetch(
-						`http://localhost:7000/addfriend?jwt=${token}`,
-						{
-							method: "POST",
-							headers: {
-								"content-type": "application/json",
-							},
-							body: JSON.stringify({
-								userName: user_name,
-								userId: user_id,
-							}),
-						},
-					);
+            const addfriend_result = await fetch(
+              `http://localhost:7000/addfriend`,
+              {
+                method: "POST",
+                headers: {
+                  "content-type": "application/json",
+                },
+                body: JSON.stringify({
+                  userName: user_name,
+                  userId: user_id,
+                }),
+              }
+            );
 
-					btn.classList.add("Cancel");
-					btn.textContent = "Cancel";
-				} else if (btn.textContent.trim() === "Cancel") {
-					// ------- CANCEl FRIEND ------- //
+            btn.classList.add("Cancel");
+            btn.textContent = "Cancel";
+          } else if (btn.textContent.trim() === "Cancel") {
+            // ------- CANCEl FRIEND ------- //
 
-					const cancel_request_result = await fetch(
-						`http://localhost:7000/addfriend-cancel?jwt=${token}`,
-						{
-							method: "POST",
-							headers: {
-								"content-type": "application/json",
-							},
-							body: JSON.stringify({
-								pending_user_id: user_id,
-							}),
-						},
-					);
+            const cancel_request_result = await fetch(
+              `http://localhost:7000/addfriend-cancel`,
+              {
+                method: "POST",
+                headers: {
+                  "content-type": "application/json",
+                },
+                body: JSON.stringify({
+                  pending_user_id: user_id,
+                }),
+              }
+            );
 
-					const data = await cancel_request_result.json();
-					console.log(data);
+            const data = await cancel_request_result.json();
+            console.log(data);
 
-					btn.classList.remove("Cancel");
-					btn.textContent = "Add";
-				}
-			});
-		});
-	});
+            btn.classList.remove("Cancel");
+            btn.textContent = "Add";
+          }
+        });
+      });
+    });
 </script>
 
 <style>
-	*,
-	body {
-		padding: 0;
-		margin: 0;
-		box-sizing: border-box;
-	}
+  *,
+  body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
 
-	.container {
-		border: 1px solid black;
-		height: 100vh;
-		width: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: baseline;
-	}
+  .container {
+    border: 1px solid black;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+  }
 
-	form {
-		margin-top: 4rem;
-		padding: 1rem;
-		border-radius: 0.7rem;
-		border: 1px solid gray;
-	}
+  form {
+    margin-top: 4rem;
+    padding: 1rem;
+    border-radius: 0.7rem;
+    border: 1px solid gray;
+  }
 
-	.content {
-		width: 400px;
-	}
+  .content {
+    width: 400px;
+  }
 
-	.userlist-container {
-		border: 1px solid gray;
-		border-radius: 0.3rem;
-		display: block;
-		margin-top: 2rem;
-		padding: 1rem 0.4rem 0.4rem 0.4rem;
-	}
+  .userlist-container {
+    border: 1px solid gray;
+    border-radius: 0.3rem;
+    display: block;
+    margin-top: 2rem;
+    padding: 1rem 0.4rem 0.4rem 0.4rem;
+  }
 
-	.user {
-		display: flex;
-		padding: 5px;
-		border-radius: 5px;
-		border: 1px solid gray;
-	}
+  .user {
+    display: flex;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid gray;
+  }
 
-	.user_id {
-		margin-left: 5px;
-		color: gray;
-	}
+  .user_id {
+    margin-left: 5px;
+    color: gray;
+  }
 
-	#interact-button {
-		border: none;
-		margin-left: auto;
-		padding: 5px 7px;
-		border-radius: 5px;
-		cursor: pointer;
-		display: grid;
-		place-items: center;
-		transition: 200ms;
-	}
+  #interact-button {
+    border: none;
+    margin-left: auto;
+    padding: 5px 7px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: 200ms;
+  }
 
-	.Add {
-		background-color: skyblue;
-	}
+  .Add {
+    background-color: skyblue;
+  }
 
-	.Add:hover {
-		background-color: rgb(15, 180, 246);
-	}
+  .Add:hover {
+    background-color: rgb(15, 180, 246);
+  }
 
-	.Accept {
-		background-color: rgb(193, 255, 100);
-	}
+  .Accept {
+    background-color: rgb(193, 255, 100);
+  }
 
-	.Accept:hover {
-		background-color: rgb(153, 255, 0);
-	}
+  .Accept:hover {
+    background-color: rgb(153, 255, 0);
+  }
 
-	.Cancel {
-		background-color: pink;
-	}
+  .Cancel {
+    background-color: pink;
+  }
 
-	.Cancel:hover {
-		background-color: rgb(255, 28, 66);
-	}
+  .Cancel:hover {
+    background-color: rgb(255, 28, 66);
+  }
 </style>

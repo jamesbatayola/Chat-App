@@ -9,20 +9,33 @@ const getLogin = async (req, res, next) => {
 
 const postLogin = async (req, res, next) => {
   try {
-    console.log(kleur.bgGreen("FROM CONTROLLER"));
-    console.log("--- " + req.body.email);
-    console.log("--- " + req.body.password);
-
     // Authenticate user & generate JWT
     const payload = await loginUser(req);
+
+    // Store jwt on cookie
+    res.cookie("jwt", payload.token, {
+      httpOnly: true, // XSS protection
+      sameSite: "Strict", // CSRF protection
+      maxAge: 3600000, // 1 hour (in milliseconds)
+    });
+
+    // Storing username
+    res.cookie("username", payload.user.name, {
+      httpOnly: false,
+      sameSite: "Strict",
+      maxAge: 3600000,
+    });
+
+    // Storing id
+    res.cookie("id", payload.user.id, {
+      httpOnly: false,
+      sameSite: "Strict",
+      maxAge: 3600000,
+    });
 
     res.status(200).json({
       status: "success",
       message: "Redirecting to home page",
-
-      // PRIMARY
-      token: payload.token,
-      user_id: payload.user.id,
     });
   } catch (err) {
     next(err);

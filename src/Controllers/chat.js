@@ -13,23 +13,32 @@ import {
 // import Friendship from "../models/friendship.js";
 
 import db from "../../Models/Index.js";
+import { sendMessage, showChatRoom } from "../services/home/Chat_Room.js";
 
 const getHome = async (req, res, next) => {
   try {
-    const user = req.user;
+    const user_chat_rooms = await req.user.getChatRooms();
 
-    if (!user) {
-      const err = new Error("User does not exist");
-      err.statusCode = 404;
-      throw err;
+    const friend_list = [];
+
+    for (let room of user_chat_rooms) {
+      const users = await room.getUsers();
+
+      for (let user of users) {
+        //
+        if (user.id !== req.user.id) {
+          friend_list.push({
+            username: user.username,
+            id: user.id,
+            chat_room_id: room.id,
+          });
+        }
+        //
+      }
     }
 
-    const userFriends = await user.getFriends({
-      through: { where: { status: "accepted" } }, // accessing junction table fields
-    });
-
     res.render("home/home.ejs", {
-      friends: userFriends,
+      friends: friend_list,
     });
   } catch (err) {
     next(err);
@@ -109,6 +118,30 @@ const postAcceptRequest = async (req, res, next) => {
   }
 };
 
+const getChatRoom = async (req, res, next) => {
+  try {
+    showChatRoom(req);
+
+    res.status(200).json({
+      status: "success",
+      message: "redirecting to chatroom",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const postSendMessage = async (req, res, next) => {
+  try {
+    sendMessage(req);
+
+    res.status(200).json({
+      status: "success",
+      message: "message sent",
+    });
+  } catch (err) {}
+};
+
 export default {
   getHome,
   getFriendRequest,
@@ -117,4 +150,6 @@ export default {
   postAddFriend,
   postCancelRequest,
   postAcceptRequest,
+  getChatRoom,
+  postSendMessage,
 };

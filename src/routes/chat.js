@@ -15,4 +15,6 @@ router.post("/searchfriend", jwtAuth, chatController.postSearchFriend);
 router.post("/addfriend", jwtAuth, chatController.postAddFriend);
 router.post("/addfriend-cancel", jwtAuth, chatController.postCancelRequest);
 
+router.get("/chatroom", jwtAuth, chatController.getChatRoom);
+router.post("/send-message", jwtAuth, chatController.postSendMessage);
 export default router;

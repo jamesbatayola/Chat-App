@@ -68,50 +68,82 @@ app.use(cookieParser());
 app.use("/auth", authRoute);
 app.use(chatRoute);
 
-app.get("/test-users", async (req, res) => {
-  const users = await db.User.findAll();
+// ======= TEST ROUTES ======= //
 
-  res.json({
-    message: "success",
-    users: users,
-  });
-});
+import { jwtAuth } from "./services/authentication/jwt.js";
 
-app.get("/test-user", async (req, res) => {
-  const user = await db.User.findByPk("JJ10");
-  const friends = await user.getFriends({
-    through: { where: { status: "accepted" } },
-  });
-  const pending = await user.getFriends({
-    through: { where: { status: "pending" } },
-  });
+// app.get("/test-users", async (req, res) => {
+//   const users = await db.User.findAll();
 
-  res.json({
-    message: "success",
-    user: user,
-    friends: friends,
-    pendings: pending,
-  });
-});
+//   res.json({
+//     message: "success",
+//     users: users,
+//   });
+// });
 
-app.get("/test-add-user", async (req, res) => {
-  const user_1 = await db.User.findByPk("JJ10");
+// app.get("/test-user", async (req, res) => {
+//   const user = await db.User.findByPk("JJ10");
+//   const friends = await user.getFriends({
+//     through: { where: { status: "accepted" } },
+//   });
+//   const pending = await user.getFriends({
+//     through: { where: { status: "pending" } },
+//   });
 
-  const user_2 = await db.User.findByPk("CI28");
+//   res.json({
+//     message: "success",
+//     user: user,
+//     friends: friends,
+//     pendings: pending,
+//   });
+// });
 
-  try {
-    await user_1.addFriend(user_2);
-  } catch (err) {
-    console.log(kleur.bgRed("ERROR OCCURED"));
-    console.log(err);
-    throw err;
-  }
+// app.get("/test-add-user", async (req, res) => {
+//   const user_1 = await db.User.findByPk("JJ10");
 
-  res.json({
-    status: "success",
-    message: `${user_1.username} added ${user_2.username}`,
-  });
-});
+//   const user_2 = await db.User.findByPk("CI28");
+
+//   try {
+//     await user_1.addFriend(user_2);
+//   } catch (err) {
+//     console.log(kleur.bgRed("ERROR OCCURED"));
+//     console.log(err);
+//     throw err;
+//   }
+
+//   res.json({
+//     status: "success",
+//     message: `${user_1.username} added ${user_2.username}`,
+//   });
+// });
+
+// app.get("/chatroom", jwtAuth, async (req, res) => {
+//   const user_chat_rooms = await req.user.getChatRooms();
+
+//   const friend_list = [];
+
+//   for (let room of user_chat_rooms) {
+//     const users = await room.getUsers();
+
+//     for (let user of users) {
+//       //
+//       if (user.id !== req.user.id) {
+//         friend_list.push({
+//           friend_username: user.username,
+//           friend_id: user.id,
+//           chat_room_id: room.id,
+//         });
+//       }
+//       //
+//     }
+//   }
+
+//   console.log(friend_list);
+
+//   res.json({
+//     friend_list: friend_list,
+//   });
+// });
 
 // global error handler
 // returns to the client

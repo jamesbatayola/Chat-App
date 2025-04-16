@@ -32,7 +32,9 @@ export default (sequelize, DataTypes) => {
     });
 
     // A user can send many message
-    User.hasMany(models.Message);
+    User.hasMany(models.Message, {
+      foreignKey: "userId",
+    });
 
     // A user can join multiple chatroom
     User.belongsToMany(models.ChatRoom, {

@@ -13,6 +13,8 @@ export default (sequelize, DataTypes) => {
       defaultValue: () => new Date(),
     },
 
+    // FOREIGN COLUMN //
+
     userId: {
       type: DataTypes.STRING(4),
       references: {

@@ -1,81 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-	</head>
-	<body>
-		<div class="container">
-			<form class="login-form" action="">
-				<h1>Login</h1>
-				<div>
-					<label for="">email</label>
-					<input class="email-input" type="text" />
-				</div>
-				<div>
-					<label for="">password</label>
-					<input class="password-input" type="text" />
-				</div>
-				<button type="submit">Login</button>
-			</form>
-		</div>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <form class="login-form" action="">
+        <h1>Login</h1>
+        <div>
+          <label for="">email</label>
+          <input class="email-input" type="text" />
+        </div>
+        <div>
+          <label for="">password</label>
+          <input class="password-input" type="text" />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </body>
 
-	<script type="module">
-		const email = document.querySelector(".email-input");
-		const password = document.querySelector(".password-input");
+  <script type="module">
+    const email = document.querySelector(".email-input");
+    const password = document.querySelector(".password-input");
 
-		document.querySelector(".login-form").addEventListener("submit", async (ev) => {
-			ev.preventDefault();
+    document
+      .querySelector(".login-form")
+      .addEventListener("submit", async (ev) => {
+        ev.preventDefault();
 
-			const response = await fetch("http://localhost:7000/auth/login", {
-				method: "POST",
-				headers: {
-					"content-type": "application/json",
-				},
-				body: JSON.stringify({
-					email: email.value,
-					password: password.value,
-				}),
-			});
+        const response = await fetch("http://localhost:7000/auth/login", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email.value,
+            password: password.value,
+          }),
+        });
 
-			const data = await response.json();
+        const data = await response.json();
 
-			// store token in sessionStorage
-			sessionStorage.setItem("token", data.token);
+        if (data.status === "success") {
+          window.location.href = `http://localhost:7000/home`;
+        }
+      });
+  </script>
 
-			if (data.status === "success") {
-				// get jwt token
-				const token = sessionStorage.getItem("token");
+  <style>
+    *,
+    body {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
 
-				console.log(token);
+    .container {
+      border: 1px solid black;
+      height: 100vh;
+      width: 100%;
+      display: grid;
+      place-items: center;
+    }
 
-				window.location.href = `http://localhost:7000/home?jwt=${token}`;
-			}
-		});
-	</script>
-
-	<style>
-		*,
-		body {
-			padding: 0;
-			margin: 0;
-			box-sizing: border-box;
-		}
-
-		.container {
-			border: 1px solid black;
-			height: 100vh;
-			width: 100%;
-			display: grid;
-			place-items: center;
-		}
-
-		form {
-			padding: 1rem;
-			border-radius: 0.7rem;
-			border: 1px solid gray;
-		}
-	</style>
+    form {
+      padding: 1rem;
+      border-radius: 0.7rem;
+      border: 1px solid gray;
+    }
+  </style>
 </html>

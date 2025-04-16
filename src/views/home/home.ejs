@@ -1,163 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-	</head>
-	<body>
-		<div class="container">
-			<div class="content">
-				<div class="friends-list">
-					<% if(friends.length <= 0) { %>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="friends-list">
+          <% if(friends.length <= 0) { %>
 
-					<p class="null-placeholder" style="text-align: center">You have no friend</p>
+          <p class="null-placeholder" style="text-align: center">
+            You have no friend
+          </p>
 
-					<% } else { %> <% for(let friend of friends) { %>
-					<div class="friend">
-						<div class="username"><%= friend.username %></div>
-						<div class="userid">#<%= friend.id %></div>
-						<div class="status"></div>
-					</div>
-					<% } %> <% } %>
-				</div>
-				<div class="button-container">
-					<div class="friend-request">Friend request</div>
-					<div class="search-friend">Add friend</div>
-				</div>
-			</div>
-		</div>
-	</body>
+          <% } else { %> <% for(let friend of friends) { %>
+          <div class="friend">
+            <div class="username"><%= friend.username %></div>
+            <div class="userid">#<%= friend.id %></div>
+            <input
+              class="chat_room_id"
+              type="text"
+              hidden
+              value="<%= friend.chat_room_id %>"
+            />
+            <div class="status"></div>
+          </div>
+          <% } %> <% } %>
+        </div>
+        <div class="button-container">
+          <div class="friend-request">Friend request</div>
+          <div class="search-friend">Add friend</div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
 
 <script type="module">
-	const friends = document.querySelectorAll(".friend");
-	const friendRequest = document.querySelector(".friend-request");
-	const searchFriend = document.querySelector(".search-friend");
+  // Fetch from cookie
+  const my_id = document.cookie
+    .split("; ")
+    .find((e) => e.startsWith("id"))
+    .split("=")
+    .pop();
 
-	// get jwt token
-	const token = sessionStorage.getItem("token");
+  const friends = document.querySelectorAll(".friend");
+  const friendRequest = document.querySelector(".friend-request");
+  const searchFriend = document.querySelector(".search-friend");
 
-	friends.forEach((friend) => {
-		friend.addEventListener("click", async (ev) => {
-			console.log("HELLO WORLD");
-		});
-	});
+  friends.forEach((friend) => {
+    friend.addEventListener("click", async (ev) => {
+      const chat_room_id =
+        ev.target.parentElement.querySelector(".chat_room_id").value;
 
-	friendRequest.addEventListener("click", (ev) => {
-		window.location.href = `http://localhost:7000/friendRequest?jwt=${token}`;
-	});
+      window.location.href = `http://localhost:7000/chatroom?id=${chat_room_id}`;
+    });
+  });
 
-	searchFriend.addEventListener("click", async (ev) => {
-		window.location.href = `http://localhost:7000/searchfriend?jwt=${token}`;
-	});
+  friendRequest.addEventListener("click", (ev) => {
+    window.location.href = `http://localhost:7000/friendRequest`;
+  });
 
-	// ------- WEB SOCKET ------- //
+  searchFriend.addEventListener("click", async (ev) => {
+    window.location.href = `http://localhost:7000/searchfriend`;
+  });
 
-	const ws = new WebSocket("ws://localhost:7000");
+  // ------- WEB SOCKET ------- //
 
-	const cookie_id = document.cookie
-		.split("; ")
-		.find((e) => e.startsWith("user_id"))
-		.split("=")
-		.pop();
+  const ws = new WebSocket("ws://localhost:7000");
 
-	ws.onmessage = (ev) => {
-		const json_data = JSON.parse(ev.data);
+  ws.onmessage = (ev) => {
+    const json_data = JSON.parse(ev.data);
 
-		const type = json_data.type;
-		const from = json_data.from;
-		const recipient = json_data.recipient;
+    const type = json_data.type;
+    const from = json_data.from;
+    const recipient = json_data.recipient;
 
-		const friends_list_container = document.querySelector(".friends-list");
+    const friends_list_container = document.querySelector(".friends-list");
 
-		if (cookie_id === recipient.id) {
-			//
-			if (json_data.type === "accept_request") {
-				//
-				if (friends_list_container.firstElementChild.classList.contains("null-placeholder")) {
-					friends_list_container.firstElementChild.remove();
-				}
+    if (cookie_id === recipient.id) {
+      //
+      if (json_data.type === "accept_request") {
+        //
+        if (
+          friends_list_container.firstElementChild.classList.contains(
+            "null-placeholder"
+          )
+        ) {
+          friends_list_container.firstElementChild.remove();
+        }
 
-				const div = document.createElement("div");
+        const div = document.createElement("div");
 
-				div.innerHTML = `
-						<div class="friend">
-							<div class="username">${from.username}</div>
-							<div class="userid">${from.id}</div>
-							<div class="status"></div>
-						</div>
-					`;
+        div.innerHTML = `
+  				<div class="friend">
+  					<div class="username">${from.username}</div>
+  					<div class="userid">${from.id}</div>
+  					<div class="status"></div>
+  				</div>
+  			`;
 
-				friends_list_container.append(div);
-			}
-		}
-	};
+        friends_list_container.append(div);
+      }
+    }
+  };
 </script>
 
 <style>
-	.container {
-		border: 1px solid black;
-		height: 100vh;
-		width: 100%;
-		display: grid;
-		place-items: center;
-	}
+  .container {
+    border: 1px solid black;
+    height: 100vh;
+    width: 100%;
+    display: grid;
+    place-items: center;
+  }
 
-	.content {
-		width: 500px;
-		display: flex;
-		flex-direction: column;
-		border: 1px solid red;
-		border-radius: 0.3rem;
-		padding: 2px;
-		gap: 1px;
-	}
+  .content {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid red;
+    border-radius: 0.3rem;
+    padding: 2px;
+    gap: 1px;
+  }
 
-	.friend {
-		border: 1px solid blue;
-		display: flex;
-		justify-content: baseline;
-		align-items: center;
-		gap: 1rem;
-		padding: 0.5rem 0.2rem;
-		cursor: pointer;
-	}
+  .friend {
+    border: 1px solid blue;
+    display: flex;
+    justify-content: baseline;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0.2rem;
+    cursor: pointer;
+  }
 
-	.friend:hover {
-		background-color: rgb(195, 195, 195);
-	}
+  .friend:hover {
+    background-color: rgb(195, 195, 195);
+  }
 
-	.status {
-		border: 1px solid green;
-		border-radius: 50%;
-		padding: 6px;
-		background-color: green;
-		cursor: pointer;
-		margin-left: auto;
-	}
+  .status {
+    border: 1px solid green;
+    border-radius: 50%;
+    padding: 6px;
+    background-color: green;
+    cursor: pointer;
+    margin-left: auto;
+  }
 
-	.button-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+  .button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-	.search-friend,
-	.friend-request {
-		border: 1px solid gray;
-		text-align: center;
-		padding: 0.5rem 0.2rem;
-		cursor: pointer;
-		flex-grow: 1;
-	}
+  .search-friend,
+  .friend-request {
+    border: 1px solid gray;
+    text-align: center;
+    padding: 0.5rem 0.2rem;
+    cursor: pointer;
+    flex-grow: 1;
+  }
 
-	.search-friend:hover,
-	.friend-request:hover {
-		background-color: rgb(195, 195, 195);
-	}
+  .search-friend:hover,
+  .friend-request:hover {
+    background-color: rgb(195, 195, 195);
+  }
 
-	.userid {
-		color: rgb(112, 112, 112);
-	}
+  .userid {
+    color: rgb(112, 112, 112);
+  }
 </style>

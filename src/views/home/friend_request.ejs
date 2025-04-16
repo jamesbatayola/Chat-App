@@ -64,8 +64,6 @@
   const addyou_container = document.querySelector(".add-you-container");
   const my_id = document.querySelector(".my-id");
 
-  const token = sessionStorage.getItem("token");
-
   const cancel_buttons = document.querySelectorAll(".cancel-button");
 
   cancel_buttons.forEach((btn) => {
@@ -76,7 +74,7 @@
         ev.target.parentElement.children[1].textContent.substring(1);
 
       const cancel_request_result = await fetch(
-        `http://localhost:7000/addfriend-cancel?jwt=${token}`,
+        `http://localhost:7000/addfriend-cancel`,
         {
           method: "POST",
           headers: {
@@ -109,7 +107,7 @@
       ev.preventDefault();
 
       const accept_request_result = await fetch(
-        `http://localhost:7000/friendRequest/accept?jwt=${token}`,
+        `http://localhost:7000/friendRequest/accept`,
         {
           method: "POST",
           headers: {

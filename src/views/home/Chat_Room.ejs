@@ -1,15 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Chat_Room</title>
-	</head>
-	<body>
-		<div class="container"></div>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat_Room</title>
+  </head>
+  <body>
+    <% const text = "hello\n\ngoodbye" %>
+
+    <div class="container">
+      <button class="back-button">Back</button>
+      <div class="chat-container">
+        <div class="convo">
+          <div class="message-container you">
+            <div class="username">JJ10</div>
+            <div class="content">Pakyu</div>
+          </div>
+          <div class="message-container friend">
+            <div class="username">SP23</div>
+            <div class="content"><%= text %></div>
+          </div>
+        </div>
+        <div class="input-panel">
+          <textarea
+            class="message-input"
+            placeholder="Type your message..."
+            rows="1"
+          ></textarea>
+          <button class="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
 
-<script></script>
+<script>
+  const my_id = document.cookie
+    .split("; ")
+    .find((e) => e.startsWith("id"))
+    .split("=")
+    .pop();
 
-<style></style>
+  const message_input = document.querySelector(".message-input");
+
+  message_input.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter" && e.shiftKey) {
+      return;
+    } else if (e.key === "Enter" && !e.shiftKey) {
+      sent_message(e);
+    }
+  });
+
+  const send_button = document.querySelector(".send-button");
+
+  send_button.addEventListener("click", async (e) => sent_message(e));
+
+  async function sent_message(e) {
+    e.preventDefault();
+
+    const send_message_res = await fetch(`http://localhost:7000/send-message`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "JJ10",
+        chat_room_id: "16",
+        content: message_input.value,
+      }),
+    });
+
+    message_input.value = "";
+  }
+
+  async function indenc_space(e) {
+    e.preventDefault();
+  }
+</script>
+
+<style>
+  .container {
+    border: 1px solid black;
+    height: 100svh;
+    width: 100%;
+  }
+
+  .chat-container {
+    border: 1px solid black;
+    height: 500px;
+    width: 600px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .convo {
+    flex-grow: 10;
+    border: 1px solid red;
+    margin-top: 4px;
+    margin-inline: 4px;
+    padding: 5px;
+  }
+
+  .input-panel {
+    flex-grow: 1;
+    border: 1px solid blue;
+    padding: 5px;
+    margin: 4px;
+  }
+
+  .message-container {
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    box-shadow: 1px 1px 3px black;
+  }
+
+  .username {
+    font-size: 0.8rem;
+
+    color: grey;
+  }
+
+  .content {
+    white-space: pre-line;
+  }
+
+  .you {
+    text-align: right;
+    background-color: greenyellow;
+  }
+
+  .friend {
+    background-color: rgb(237, 237, 237);
+  }
+</style>
