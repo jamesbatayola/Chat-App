@@ -9,11 +9,8 @@ import {
   acceptFriendRequest,
 } from "../services/home/friendRequest.js";
 
-// import User from "../models/user.js";
-// import Friendship from "../models/friendship.js";
-
 import db from "../../Models/Index.js";
-import { sendMessage, showChatRoom } from "../services/home/Chat_Room.js";
+import { sendMessage, fetchMessages } from "../services/home/Chat_Room.js";
 
 const getHome = async (req, res, next) => {
   try {
@@ -120,11 +117,12 @@ const postAcceptRequest = async (req, res, next) => {
 
 const getChatRoom = async (req, res, next) => {
   try {
-    showChatRoom(req);
+    const messages = await fetchMessages(req);
 
-    res.status(200).json({
-      status: "success",
-      message: "redirecting to chatroom",
+    console.log(messages);
+
+    res.render("home/Chat_Room.ejs", {
+      messages: messages,
     });
   } catch (err) {
     next(err);

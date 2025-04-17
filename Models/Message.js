@@ -40,10 +40,14 @@ export default (sequelize, DataTypes) => {
 
   Message.associate = (models) => {
     // A message is sent by one specific user
-    Message.belongsTo(models.User);
+    Message.belongsTo(models.User, {
+      foreignKey: "userId",
+    });
 
     // Each message belongs to one specific chatroom
-    Message.belongsTo(models.ChatRoom);
+    Message.belongsTo(models.ChatRoom, {
+      foreignKey: "chatRoomId",
+    });
   };
 
   return Message;

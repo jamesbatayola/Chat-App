@@ -10,7 +10,9 @@ export default (sequelize, DataTypes) => {
 
   ChatRoom.associate = (models) => {
     // A chatroom can have multiple messages
-    ChatRoom.hasMany(models.Message);
+    ChatRoom.hasMany(models.Message, {
+      foreignKey: "chatRoomId",
+    });
 
     // A chatroom can have multiple users
     ChatRoom.belongsToMany(models.User, {

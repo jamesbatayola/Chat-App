@@ -6,20 +6,20 @@
     <title>Chat_Room</title>
   </head>
   <body>
-    <% const text = "hello\n\ngoodbye" %>
+    <script></script>
 
     <div class="container">
       <button class="back-button">Back</button>
       <div class="chat-container">
         <div class="convo">
-          <div class="message-container you">
-            <div class="username">JJ10</div>
-            <div class="content">Pakyu</div>
+          <% if(messages.length <= 0) { %>
+          <h2>Start convo</h2>
+          <% } else { %> <% for(let msg of messages) { %>
+          <div class="message-container <%= msg.isMine ? 'you' : 'friend' %>">
+            <div class="username"><%= msg.from %></div>
+            <div class="content"><%= msg.content %></div>
           </div>
-          <div class="message-container friend">
-            <div class="username">SP23</div>
-            <div class="content"><%= text %></div>
-          </div>
+          <% } %> <% } %>
         </div>
         <div class="input-panel">
           <textarea
