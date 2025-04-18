@@ -21,6 +21,11 @@ export default {
         updatedAt: new Date(),
       },
     ]);
+
+    // Reset the sequence based on the current Max(id)
+    await queryInterface.sequelize.query(`
+        SELECT setval('\"Messages_id_seq\"', (SELECT MAX(id) FROM "Messages"));
+      `);
   },
 
   async down(queryInterface, Sequelize) {

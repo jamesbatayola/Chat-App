@@ -78,7 +78,7 @@ const postSearchFriend = async (req, res, next) => {
 
 const postAddFriend = async (req, res, next) => {
   try {
-    const addFriendRes = addFriend(req);
+    const addFriendRes = addFriend(req); // service layer
 
     res.status(200).json({
       status: "success",
@@ -91,7 +91,7 @@ const postAddFriend = async (req, res, next) => {
 
 const postCancelRequest = async (req, res, next) => {
   try {
-    cancelFriendRequest(req);
+    cancelFriendRequest(req); // service layer
 
     res.status(200).json({
       status: "success",
@@ -104,7 +104,7 @@ const postCancelRequest = async (req, res, next) => {
 
 const postAcceptRequest = async (req, res, next) => {
   try {
-    acceptFriendRequest(req);
+    acceptFriendRequest(req); // service layer
 
     res.status(200).json({
       status: "success",
@@ -117,11 +117,13 @@ const postAcceptRequest = async (req, res, next) => {
 
 const getChatRoom = async (req, res, next) => {
   try {
-    const messages = await fetchMessages(req);
+    const chat_room_id = req.query.chat_room_id;
+    const messages = await fetchMessages(req); // service layer
 
     console.log(messages);
 
     res.render("home/Chat_Room.ejs", {
+      chat_room_id: chat_room_id,
       messages: messages,
     });
   } catch (err) {

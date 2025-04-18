@@ -6,8 +6,7 @@
     <title>Chat_Room</title>
   </head>
   <body>
-    <script></script>
-
+    <input id="chat_room_id" type="text" hidden value="<%= chat_room_id %>" />
     <div class="container">
       <button class="back-button">Back</button>
       <div class="chat-container">
@@ -41,6 +40,8 @@
     .split("=")
     .pop();
 
+  const chat_room_id = document.getElementById("chat_room_id").value;
+
   const message_input = document.querySelector(".message-input");
 
   message_input.addEventListener("keydown", async (e) => {
@@ -64,8 +65,8 @@
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        from: "JJ10",
-        chat_room_id: "16",
+        from: my_id,
+        chat_room_id: chat_room_id,
         content: message_input.value,
       }),
     });
@@ -73,9 +74,42 @@
     message_input.value = "";
   }
 
-  async function indenc_space(e) {
-    e.preventDefault();
-  }
+  // ----- recieve message (websocket) ----- //
+
+  // Object structure
+  /*
+      {
+        from: "JJ10"
+        content: "hello"
+      }
+    */
+
+  const convo_container = document.querySelector(".convo");
+
+  const ws = new WebSocket("ws://localhost:7000");
+
+  ws.onmessage = (ev) => {
+    const json_data = JSON.parse(ev.data);
+
+    if (json_data.chat_room_id !== chat_room_id) return;
+
+    const div = document.createElement("div");
+
+    div.classList.add("message-container");
+
+    if (json_data.from === my_id) {
+      div.classList.add("you");
+    } else {
+      div.classList.add("friend");
+    }
+
+    div.innerHTML = `
+        <div class="username">${json_data.from}</div>
+        <div class="content">${json_data.content}</div>
+      `;
+
+    convo_container.appendChild(div);
+  };
 </script>
 
 <style>

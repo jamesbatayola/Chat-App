@@ -1,10 +1,11 @@
 import kleur from "kleur";
 import db from "../../../Models/Index.js";
+import { getWsServer } from "../../public/ws.js";
 
 export const fetchMessages = async (req) => {
-  const id = req.query.id;
+  const chat_room_id = req.query.chat_room_id;
 
-  const chat_room = await db.ChatRoom.findByPk(id);
+  const chat_room = await db.ChatRoom.findByPk(chat_room_id);
   const chat_room_messages = await chat_room.getMessages();
 
   const message_list = [];
@@ -20,9 +21,32 @@ export const fetchMessages = async (req) => {
   return message_list;
 };
 
-export const sendMessage = (req) => {
-  const { content } = req.body;
+export const sendMessage = async (req) => {
+  const { from, chat_room_id, content } = req.body;
 
-  console.log(kleur.bgGreen("HHHHH"));
-  console.log(content);
+  const user_room = await req.user.getChatRooms({
+    where: { id: chat_room_id },
+  });
+
+  await user_room[0].createMessage({
+    userId: from,
+    content: content,
+    sent_datetime: new Date(),
+  });
+
+  // ----- notify (websockt) ----- //
+
+  const ws = getWsServer();
+
+  ws.clients.forEach((client) => {
+    if (client.readState === ws.OPEN) {
+      client.send(
+        JSON.stringify({
+          from: `${req.user.id}`,
+          chat_room_id: chat_room_id,
+          content: content,
+        })
+      );
+    }
+  });
 };
